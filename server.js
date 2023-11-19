@@ -8,12 +8,3 @@ app.listen(port, () => {
 
 app.use("/", express.static("static"))
 
-// app.get('/entry', (req, res) => {
-//     res.sendFile('./static/cardentry.html', {root:'.'})
-// })
-// app.get('/entry.js', (req, res) => {
-//     res.sendFile('./static/cardentry.js', {root:'.'})
-// })
-// app.get('/entry.css', (req, res) => {
-//     res.sendFile('./static/cardentry.css', {root:'.'})
-// })
