@@ -65,8 +65,15 @@ img.card { border-radius: 4.75% / 3.5% }
 
 table {
     outline: 2px solid black;
+    margin: auto;
 }
 
 th, td, tr {
     outline: 1px solid black;
+}
+
+div#buttons {
+    display: flex;
+    justify-content: center;
+    column-gap: 1em;
 }
