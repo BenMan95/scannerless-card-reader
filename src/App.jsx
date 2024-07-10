@@ -32,10 +32,11 @@ function App() {
         });
     }
 
-    const data = cards.map(card => [card.qty, card.id, card.name, card.set, card.cn, card.lang, card.finish]);
-    data.unshift(['Count', 'ID', 'Name', 'Edition', 'Collector Number', 'Language', 'Foil']);
-    const output = data.map(row => '"' + row.join('","') + '"').join('\n');
-    const blob = new Blob([output], {type: 'text/csv'})
+    const dataArr = cards.map(card => [card.qty, card.id, card.name, card.set, card.cn, card.lang, card.finish]);
+    dataArr.unshift(['Count', 'ID', 'Name', 'Edition', 'Collector Number', 'Language', 'Foil']);
+
+    const data = dataArr.map(row => '"' + row.join('","') + '"').join('\n');
+    const blob = new Blob([data], {type: 'text/csv'})
     const url = URL.createObjectURL(blob);
 
     return (

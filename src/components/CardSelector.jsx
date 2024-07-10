@@ -29,12 +29,12 @@ function Selector(props) {
 
         if (formVals.name || formVals.set || formVals.cn) {
             const query = filters.join(' ');
-            let next_url = encodeURI(`https://api.scryfall.com/cards/search?unique=prints&q=not:digital ${query}`);
+            let url = encodeURI(`https://api.scryfall.com/cards/search?unique=prints&q=not:digital ${query}`);
             setTimeout(async () => {
                 try {
                     do {
-                        let response = await fetch(next_url, {signal:controller.signal});
-                        let json = await response.json();
+                        const response = await fetch(next_url, {signal:controller.signal});
+                        const json = await response.json();
 
                         if (json.object === 'error') {
                             alert(`${json.status} Error: ${json.code}\n${json.details}`);
@@ -44,8 +44,8 @@ function Selector(props) {
                         setResults(current => [...current, ...json.data]);
                         setHovered(current => current || json.data[0]);
 
-                        next_url = json.has_next && json.next_page;
-                    } while (next_url);
+                        url = json.next_page;
+                    } while (json.has_more);
                 } catch (e) {
                     if (e.name !== 'AbortError') {
                         console.log(e);
