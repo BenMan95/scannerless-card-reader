@@ -33,7 +33,7 @@ function Selector(props) {
             setTimeout(async () => {
                 try {
                     do {
-                        const response = await fetch(next_url, {signal:controller.signal});
+                        const response = await fetch(url, {signal:controller.signal});
                         const json = await response.json();
 
                         if (json.object === 'error') {
