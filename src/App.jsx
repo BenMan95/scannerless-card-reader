@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import CardSelector from './components/CardSelector.jsx'
+import CardTable from './components/CardTable.jsx'
 import './App.css';
-import CardSelector from './components/CardSelector.js'
-import CardTable from './components/CardTable.js'
 
 function App() {
     const [cards, setCards] = useState([]);
