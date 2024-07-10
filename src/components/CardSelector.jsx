@@ -73,7 +73,6 @@ function Selector(props) {
             props.onSelect(card);
         }
 
-        console.log(shift);
         setVals({name:'', set:'', cn:''});
         setResults([]);
         setHovered(null);
