@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import CardSelector from './components/CardSelector.jsx';
 import CardTable from './components/CardTable.jsx';
+import { toCSV, fromCSV } from './csv.js';
 import './App.css';
 
 function App() {
@@ -42,10 +43,7 @@ function App() {
             reader.onerror = () => alert('Failed to read file');
             reader.onloadend = () => fileInput.current.value = null;
             reader.onload = () => {
-                const array = reader.result.split('\n')
-                                           .map(line => line.substr(1,line.length-2)
-                                                            .split('","')
-                                                            .map(entry => entry.replaceAll('""','"')));
+                const array = fromCSV(reader.result);
                 const header = array.shift().map(attr => {
                     const attrs_map = {
                         'Count':            'qty',
@@ -76,16 +74,8 @@ function App() {
         const array = cards.map(card => [card.qty, card.id, card.name, card.set, card.cn, card.lang, card.finish]);
         array.unshift(['Count', 'ID', 'Name', 'Edition', 'Collector Number', 'Language', 'Foil']);
 
-        for (let row of array) {
-            for (let i in row) {
-                if (typeof row[i] == 'string') {
-                    row[i] = row[i].replaceAll('"', '""');
-                }
-            }
-        }
-
-        const data = array.map(row => '"' + row.join('","') + '"').join('\n');
-        const blob = new Blob([data], {type: 'text/csv'})
+        const csv = toCSV(array);
+        const blob = new Blob([csv], {type: 'text/csv'})
         const url = URL.createObjectURL(blob);
 
         setOutURL(url);
