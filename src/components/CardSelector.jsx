@@ -29,11 +29,11 @@ function Selector(props) {
 
         if (formVals.name || formVals.set || formVals.cn) {
             const query = filters.join(' ');
-            let url = encodeURI(`https://api.scryfall.com/cards/search?unique=prints&q=not:digital ${query}`);
+            let next_url = encodeURI(`https://api.scryfall.com/cards/search?unique=prints&q=not:digital include:extras ${query}`);
             setTimeout(async () => {
                 try {
                     do {
-                        const response = await fetch(url, {signal:controller.signal});
+                        const response = await fetch(next_url, {signal:controller.signal});
                         const json = await response.json();
 
                         if (json.object === 'error') {
@@ -44,8 +44,8 @@ function Selector(props) {
                         setResults(current => [...current, ...json.data]);
                         setHovered(current => current || json.data[0]);
 
-                        url = json.next_page;
-                    } while (json.has_more);
+                        next_url = json.has_more && json.next_page;
+                    } while (next_url);
                 } catch (e) {
                     if (e.name !== 'AbortError') {
                         console.log(e);
@@ -61,11 +61,19 @@ function Selector(props) {
         };
     }, [formVals]);
 
-    function updateSearch(e) {
-        const target = e.target;
-        const newVals = {...formVals};
-        newVals[target.id] = target.value;
-        setVals(newVals);
+    function updateName(e) {
+        const newVal = e.target.value.replaceAll('"','');
+        setVals({...formVals, name:newVal})
+    }
+
+    function updateSet(e) {
+        const newVal = e.target.value.replaceAll(' ','');
+        setVals({...formVals, set:newVal})
+    }
+
+    function updateCN(e) {
+        const newVal = e.target.value.replaceAll(' ','');
+        setVals({...formVals, cn:newVal})
     }
 
     function selectCard(card) {
@@ -84,34 +92,35 @@ function Selector(props) {
     }
 
     return (
-        <div id='outer'>
-            <div id='inner'>
-                <form id='search' autoComplete='off' onSubmit={handleSubmit}>
+        <div id="outer">
+            <div id="inner">
+                <form id="search" autoComplete="off" onSubmit={handleSubmit}>
                     <p>
-                        <label htmlFor='name'>Card Name: </label>
-                        <input value={formVals.name} id='name' placeholder='Card Name' onChange={updateSearch} autoFocus/>
+                        <label htmlFor="name">Card Name: </label>
+                        <input value={formVals.name} name="name" placeholder="Card Name" onChange={updateName} autoFocus/>
                     </p>
                     <p>
-                        <label htmlFor='set'>Set Code: </label>
-                        <input value={formVals.set} id='set' placeholder='Set Code' onChange={updateSearch}/>
+                        <label htmlFor="set">Set Code: </label>
+                        <input value={formVals.set} name="set" placeholder="Set Code" onChange={updateSet}/>
                     </p>
                     <p>
-                        <label htmlFor='cn'>Number: </label>
-                        <input value={formVals.cn} id='cn' placeholder='Collector Number' onChange={updateSearch}/>
+                        <label htmlFor="cn">Number: </label>
+                        <input value={formVals.cn} name="cn" placeholder="Collector Number" onChange={updateCN}/>
                     </p>
-                    <input type='submit' hidden/>
+                    <input type="submit" hidden/>
                 </form>
-                <div id='big-card-container'>
+                <div id="big-card-container">
                     {hovered && (
-                        <img className='card' id='big-card' alt='Selected Card'
+                        <img className="card" id="big-card" alt="Selected Card"
                              src={(hovered.image_uris ?? hovered.card_faces[0].image_uris).large}/>
                     )}
                 </div>
             </div>
-            <div id='small-cards'>
-                {results.map(card => {
+            <div id="small-cards">
+                {results.filter(card => card.image_status !== 'missing')
+                        .map(card => {
                     const images = card.image_uris ?? card.card_faces[0].image_uris;
-                    return (<img className='card'
+                    return (<img className="card"
                                  src={images.small}
                                  key={card.id}
                                  alt={card.name}

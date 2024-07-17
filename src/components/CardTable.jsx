@@ -12,8 +12,8 @@ function CardTable(props) {
                 </tr>
             </thead>
             <tbody>
-                {props.cards.map(card => (
-                    <tr>
+                {props.cards.map((card, index) => (
+                    <tr key={index}>
                         <td>{card.qty}</td>
                         <td>{card.name}</td>
                         <td>{card.set}</td>
