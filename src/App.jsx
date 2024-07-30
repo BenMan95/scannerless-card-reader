@@ -44,6 +44,8 @@ function App() {
             reader.onloadend = () => fileInput.current.value = null;
             reader.onload = () => {
                 const array = fromCSV(reader.result);
+
+                // Map csv headers to internal attribute names
                 const header = array.shift().map(attr => {
                     const attrs_map = {
                         'Count':            'qty',
@@ -57,6 +59,7 @@ function App() {
                     return attrs_map[attr];
                 });
 
+                // Convert list data to card objects
                 const cards = array.map(row => {
                     const card = {};
                     row.map((val,i) => card[header[i]] = val);

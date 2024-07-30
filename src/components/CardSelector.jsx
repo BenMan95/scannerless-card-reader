@@ -4,29 +4,19 @@ function Selector(props) {
     const [formVals, setVals] = useState({name:'', set:'', cn:''});
     const [results, setResults] = useState([]);
     const [hovered, setHovered] = useState(null);
-    const [shift, setShift] = useState(false);
-
-    useEffect(() => {
-        const press = e => {if (e.key === 'Shift') setShift(true)};
-        const unpress = e => {if (e.key === 'Shift') setShift(false)};
-
-        document.addEventListener('keydown', press);
-        document.addEventListener('keyup', unpress);
-
-        return () => {
-            document.removeEventListener('keydown', press);
-            document.removeEventListener('keyup', unpress);
-        }
-    }, []);
 
     useEffect(() => {
         const controller = new AbortController();
 
         const filters = [];
-        if (formVals.name) filters.push(`name:'${formVals.name}'`);
+        if (formVals.name) {
+            const escaped = formVals.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            filters.push(`name:/${escaped}/`);
+        }
         if (formVals.set) filters.push(`s:'${formVals.set}'`);
         if (formVals.cn) filters.push(`cn:'${formVals.cn}'`);
 
+        // If query is not empty, search for cards and add them to the results
         if (formVals.name || formVals.set || formVals.cn) {
             const query = filters.join(' ');
             let next_url = encodeURI(`https://api.scryfall.com/cards/search?unique=prints&q=not:digital include:extras ${query}`);
@@ -54,6 +44,7 @@ function Selector(props) {
             }, 500);
         }
 
+        // Cancel search if input values are still being edited
         return () => {
             controller.abort();
             setResults([]);
@@ -61,21 +52,22 @@ function Selector(props) {
         };
     }, [formVals]);
 
+    // Functions for updating and checking form values
     function updateName(e) {
-        const newVal = e.target.value.replaceAll('"','');
+        const newVal = e.target.value;
         setVals({...formVals, name:newVal})
     }
-
     function updateSet(e) {
         const newVal = e.target.value.replaceAll(' ','');
         setVals({...formVals, set:newVal})
     }
-
     function updateCN(e) {
         const newVal = e.target.value.replaceAll(' ','');
         setVals({...formVals, cn:newVal})
     }
 
+    // When a card is selected, run the passed onSelect function
+    // and reset the form values
     function selectCard(card) {
         if (card != null) {
             props.onSelect(card);
@@ -86,6 +78,7 @@ function Selector(props) {
         setHovered(null);
     }
 
+    // When submitted through the form, select the hovered card
     function handleSubmit(e) {
         e.preventDefault();
         selectCard(hovered);
