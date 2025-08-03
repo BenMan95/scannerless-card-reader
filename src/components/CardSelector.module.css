@@ -1,13 +1,11 @@
-body { margin: 0 }
-
-div#outer {
+div.outer {
     display: flex;
 
     height: 80vh;
     outline: 2px solid black;
 }
 
-div#inner {
+div.inner {
     flex: 0 1 20%;
     gap: 1em;
 
@@ -18,7 +16,7 @@ div#inner {
     outline: 2px solid black;
 }
 
-form#search {
+form.search {
     flex: 0 0 auto;
 
     outline: 2px solid black;
@@ -26,7 +24,7 @@ form#search {
     padding: 0 1em;
 }
 
-div#big-card-container {
+div.big-card-container {
     flex: 1 1 auto;
 
     display: flex;
@@ -36,13 +34,13 @@ div#big-card-container {
     overflow: hidden;
 }
 
-img#big-card {
+img.big-card {
     max-height: 100%;
     max-width: 100%;
     height: auto;
 }
 
-div#small-cards {
+div.small-cards {
     flex: 0 1 80%;
 
     display: flex;
@@ -57,23 +55,8 @@ div#small-cards {
     align-self: flex-start;
 }
 
-div#small-cards img {
+div.small-cards img {
     width: 10%;
 }
 
 img.card { border-radius: 4.75% / 3.5% }
-
-table {
-    outline: 2px solid black;
-    margin: auto;
-}
-
-th, td, tr {
-    outline: 1px solid black;
-}
-
-div#buttons {
-    display: flex;
-    justify-content: center;
-    column-gap: 1em;
-}

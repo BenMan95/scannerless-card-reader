@@ -1,4 +1,6 @@
-function CardTable(props) {
+import styles from './CardTable.module.css';
+
+function CardTable({cards, handleClick}) {
     return (
         <table>
             <thead>
@@ -12,8 +14,8 @@ function CardTable(props) {
                 </tr>
             </thead>
             <tbody>
-                {props.cards.map((card, index) => (
-                    <tr key={index}>
+                {cards.map((card, index) => (
+                    <tr key={index} onClick={() => handleClick(card)}>
                         <td>{card.qty}</td>
                         <td>{card.name}</td>
                         <td>{card.set}</td>

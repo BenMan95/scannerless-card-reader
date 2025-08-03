@@ -1,0 +1,7 @@
+body { margin: 0 }
+
+div.buttons {
+    display: flex;
+    justify-content: center;
+    column-gap: 1em;
+}

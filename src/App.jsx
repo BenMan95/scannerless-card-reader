@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import CardSelector from './components/CardSelector.jsx';
 import CardTable from './components/CardTable.jsx';
 import { toCSV, fromCSV } from './csv.js';
-import './App.css';
+import styles from './App.module.css';
 
 function App() {
     const [cards, setCards] = useState([]);
@@ -73,6 +73,10 @@ function App() {
         }
     }
 
+    function clickCardInTable(card) {
+        console.log(card)
+    }
+
     useEffect(() => {
         const array = cards.map(card => [card.qty, card.id, card.name, card.set, card.cn, card.lang, card.finish]);
         array.unshift(['Count', 'ID', 'Name', 'Edition', 'Collector Number', 'Language', 'Foil']);
@@ -89,9 +93,9 @@ function App() {
         <div>
             <CardSelector onSelect={addCard}/>
             <br/>
-            <CardTable cards={cards}/>
+            <CardTable cards={cards} handleClick={clickCardInTable}/>
             <br/>
-            <div id="buttons">
+            <div className={styles['buttons']}>
                 <button onClick={() => fileInput.current.click()}>Import</button>
                 <input id="input" type="file" ref={fileInput} onChange={readFile} hidden/>
                 <a href={outURL} download="cards.csv">

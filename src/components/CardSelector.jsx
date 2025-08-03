@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import styles from './CardSelector.module.css';
 
 function Selector(props) {
     const [formVals, setVals] = useState({name:'', set:'', cn:''});
@@ -85,9 +86,9 @@ function Selector(props) {
     }
 
     return (
-        <div id="outer">
-            <div id="inner">
-                <form id="search" autoComplete="off" onSubmit={handleSubmit}>
+        <div className={styles['outer']}>
+            <div className={styles['inner']}>
+                <form className={styles['search']} autoComplete="off" onSubmit={handleSubmit}>
                     <p>
                         <label htmlFor="name">Card Name: </label>
                         <input value={formVals.name} name="name" placeholder="Card Name" onChange={updateName} autoFocus/>
@@ -102,18 +103,18 @@ function Selector(props) {
                     </p>
                     <input type="submit" hidden/>
                 </form>
-                <div id="big-card-container">
+                <div className={styles['big-card-container']}>
                     {hovered && (
-                        <img className="card" id="big-card" alt="Selected Card"
+                        <img className={`${styles['card']} ${styles['big-card']}`} alt="Selected Card"
                              src={(hovered.image_uris ?? hovered.card_faces[0].image_uris).large}/>
                     )}
                 </div>
             </div>
-            <div id="small-cards">
+            <div className={styles['small-cards']}>
                 {results.filter(card => card.image_status !== 'missing')
                         .map(card => {
                     const images = card.image_uris ?? card.card_faces[0].image_uris;
-                    return (<img className="card"
+                    return (<img className={styles['card']}
                                  src={images.small}
                                  key={card.id}
                                  alt={card.name}
