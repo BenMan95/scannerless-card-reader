@@ -39,8 +39,8 @@ function fromCSV(csv: string) {
 
       // Add token to row for comma
       if (csv[i] === ',') {
-        let len = closingQuote ? end-start : i-start;
-        let token = csv.substr(start, len).replaceAll('""','"')
+        const len = closingQuote ? end-start : i-start;
+        const token = csv.substr(start, len).replaceAll('""','"')
         row.push(token);
 
         openingQuote = false;
@@ -50,8 +50,8 @@ function fromCSV(csv: string) {
 
       // Add token and row for newline
       if (csv[i] === '\n') {
-        let len = closingQuote ? end-start : i-start;
-        let token = csv.substr(start, len).replaceAll('""','"')
+        const len = closingQuote ? end-start : i-start;
+        const token = csv.substr(start, len).replaceAll('""','"')
         row.push(token);
 
         output.push(row);

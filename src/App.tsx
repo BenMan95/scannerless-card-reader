@@ -18,7 +18,7 @@ function App() {
         setCards(current => {
             const newCards = [...current];
 
-            for (let card of newCards) {
+            for (const card of newCards) {
                 if (card.id === newCard.id) {
                     card.qty += 1;
                     return newCards;
@@ -69,7 +69,7 @@ function App() {
 
                 const cards: Card[] = array.map(row => {
                     const card: any = {};
-                    for (let i in row) {
+                    for (const i in row) {
                         const header = mappedHeaders[i];
                         if (header) card[header] = row[i];
                     }

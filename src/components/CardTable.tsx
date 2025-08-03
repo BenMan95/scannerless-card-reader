@@ -1,4 +1,4 @@
-import styles from './CardTable.module.css';
+import './CardTable.module.css';
 import type { Card } from '../utils/types';
 
 interface CardTableProps {

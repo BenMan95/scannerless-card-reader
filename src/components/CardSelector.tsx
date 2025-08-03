@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import type { ScryfallCard, ScryfallError, ScryfallList } from '../utils/scryfall';
 
 interface CardSelectorProps {
-    onSelect: (card: any) => void,
+    onSelect: (card: ScryfallCard) => void,
 }
 
 interface FormVals {
