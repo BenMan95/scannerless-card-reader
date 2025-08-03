@@ -26,8 +26,8 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
                         <button onClick={onDelete}>Delete</button>
                     </div>
                     <div className={styles['right']}>
-                        <button onClick={onCancel}>Cancel</button>
                         <button onClick={() => onSave(newCard)}>Save</button>
+                        <button onClick={onCancel}>Cancel</button>
                     </div>
                 </div>
             </div>

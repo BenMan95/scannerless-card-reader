@@ -7,7 +7,6 @@ import { toCSV, fromCSV } from './utils/csv.ts';
 import type { Card } from './utils/types.ts';
 import type { ScryfallCard } from './utils/scryfall';
 
-
 function App() {
     const [cards, setCards] = useState<Card[]>([]);
     const [outURL, setOutURL] = useState<string | undefined>(undefined);
