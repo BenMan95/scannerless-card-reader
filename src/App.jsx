@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import CardSelector from './components/CardSelector.jsx';
 import CardTable from './components/CardTable.jsx';
+import CardEditorPopup from './components/CardEditorPopup.jsx';
 import { toCSV, fromCSV } from './csv.js';
 import styles from './App.module.css';
 
 function App() {
     const [cards, setCards] = useState([]);
     const [outURL, setOutURL] = useState(null);
+    const [editIndex, setEditIndex] = useState(null);
     const fileInput = useRef(null);
 
     function addCard(newCard) {
@@ -73,10 +75,6 @@ function App() {
         }
     }
 
-    function clickCardInTable(card) {
-        console.log(card)
-    }
-
     useEffect(() => {
         const array = cards.map(card => [card.qty, card.id, card.name, card.set, card.cn, card.lang, card.finish]);
         array.unshift(['Count', 'ID', 'Name', 'Edition', 'Collector Number', 'Language', 'Foil']);
@@ -89,11 +87,24 @@ function App() {
         return () => URL.revokeObjectURL(url);
     }, [cards]);
 
+    function handleEditDelete() {
+        setCards(current => current.filter((_, index) => index !== editIndex));
+        setEditIndex(null);
+    }
+    function handleEditCancel() {
+        setEditIndex(null);
+    }
+    function handleEditSave(newCard) {
+        // TODO: Save updated card to cards list
+        console.log(newCard);
+        setEditIndex(null);
+    }
+
     return (
-        <div>
+        <>
             <CardSelector onSelect={addCard}/>
             <br/>
-            <CardTable cards={cards} handleClick={clickCardInTable}/>
+            <CardTable cards={cards} handleClick={setEditIndex}/>
             <br/>
             <div className={styles['buttons']}>
                 <button onClick={() => fileInput.current.click()}>Import</button>
@@ -102,7 +113,16 @@ function App() {
                     <button>Export</button>
                 </a>
             </div>
-        </div>
+            {
+                editIndex === null ? null :
+                <CardEditorPopup
+                    card={cards[editIndex]}
+                    onDelete={handleEditDelete}
+                    onCancel={handleEditCancel}
+                    onSave={handleEditSave}
+                />
+            }
+        </>
     );
 }
 

@@ -1,0 +1,54 @@
+div.background {
+    position: absolute;
+    top: 0;
+
+    min-width: 100%;
+    min-height: 100%;
+
+    background-color: rgba(0,0,0,0.2);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.window {
+    opacity: 100%;
+    text-align: center;
+    background-color: white;
+    border-radius: 1em;
+    min-width: 20em;
+    height: 10em;
+    
+    display: flex;
+    flex-direction: column;
+}
+
+div.main {
+}
+
+div.buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+div.buttons > div.left {
+    flex: 1 0 auto;
+
+    display: flex;
+    flex-direction: row;
+}
+
+div.buttons > div.right {
+    flex: 1 0 auto;
+
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+div.buttons > div {
+    margin: 1em;
+    gap: 1em;
+}
+
+img.card { border-radius: 4.75% / 3.5% }

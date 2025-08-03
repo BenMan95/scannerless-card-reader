@@ -15,7 +15,7 @@ function CardTable({cards, handleClick}) {
             </thead>
             <tbody>
                 {cards.map((card, index) => (
-                    <tr key={index} onClick={() => handleClick(card)}>
+                    <tr key={index} onClick={() => handleClick(index)}>
                         <td>{card.qty}</td>
                         <td>{card.name}</td>
                         <td>{card.set}</td>
