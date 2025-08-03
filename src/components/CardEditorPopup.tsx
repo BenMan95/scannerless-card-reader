@@ -1,9 +1,17 @@
-import { useEffect, useState } from 'react';
 import styles from './CardEditorPopup.module.css';
+import { useEffect, useState } from 'react';
+import type { Card } from '../utils/types';
 
-function CardEditorPopup({card, onDelete, onCancel, onSave}) {
-    const [cardData, setCardData] = useState();
-    const [newCard, setNewCard] = useState({...card});
+interface CardEditorProps {
+    card: Card,
+    onDelete: () => void,
+    onCancel: () => void,
+    onSave: (newCard: Card) => void,
+}
+
+function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
+    const [cardData, setCardData] = useState<Card>();
+    const [newCard, setNewCard] = useState<Card>({...card});
 
     return (
         <div className={styles['background']}>
@@ -27,4 +35,4 @@ function CardEditorPopup({card, onDelete, onCancel, onSave}) {
     )
 }
 
-export default CardEditorPopup;
+export default CardEditor;

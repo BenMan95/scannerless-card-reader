@@ -2,7 +2,7 @@
 // Ex: The line `123,4"5"6,789` is read as `['123', '5', '789']`
 
 // Read from a CSV string to a 2D array
-function fromCSV(csv) {
+function fromCSV(csv: string) {
   csv = csv.trim() + '\n';
 
   const output = [];
@@ -68,7 +68,7 @@ function fromCSV(csv) {
 }
 
 // Convert a 2D array to a CSV string
-function toCSV(data) {
+function toCSV(data: any[][]) {
   return data.map(row => 
     row.map(ele => {
       ele = String(ele);

@@ -1,6 +1,12 @@
 import styles from './CardTable.module.css';
+import type { Card } from '../utils/types';
 
-function CardTable({cards, handleClick}) {
+interface CardTableProps {
+    cards: Card[],
+    handleClick: (index: number) => void,
+}
+
+function CardTable({ cards, handleClick }: CardTableProps) {
     return (
         <table>
             <thead>

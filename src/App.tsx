@@ -1,17 +1,20 @@
-import { useState, useRef, useEffect } from 'react';
-import CardSelector from './components/CardSelector.jsx';
-import CardTable from './components/CardTable.jsx';
-import CardEditorPopup from './components/CardEditorPopup.jsx';
-import { toCSV, fromCSV } from './csv.js';
 import styles from './App.module.css';
+import React, { useState, useRef, useEffect } from 'react';
+import CardSelector from './components/CardSelector.tsx';
+import CardTable from './components/CardTable.tsx';
+import CardEditor from './components/CardEditorPopup.tsx';
+import { toCSV, fromCSV } from './utils/csv.ts';
+import type { Card } from './utils/types.ts';
+import type { ScryfallCard } from './utils/scryfall';
+
 
 function App() {
-    const [cards, setCards] = useState([]);
-    const [outURL, setOutURL] = useState(null);
-    const [editIndex, setEditIndex] = useState(null);
-    const fileInput = useRef(null);
+    const [cards, setCards] = useState<Card[]>([]);
+    const [outURL, setOutURL] = useState<string | undefined>(undefined);
+    const [editIndex, setEditIndex] = useState<number | null>(null);
+    const fileInput = useRef<HTMLInputElement>(null);
 
-    function addCard(newCard) {
+    function addCard(newCard: ScryfallCard) {
         setCards(current => {
             const newCards = [...current];
 
@@ -37,19 +40,22 @@ function App() {
         });
     }
 
-    async function readFile() {
-        const files = fileInput.current.files;
-        if (files.length > 0) {
+    async function readFile(e: React.ChangeEvent<HTMLInputElement>) {
+        const files = e.target.files;
+        if (files && files.length > 0) {
             const reader = new FileReader();
+            reader.readAsText(files[0]);
 
             reader.onerror = () => alert('Failed to read file');
-            reader.onloadend = () => fileInput.current.value = null;
+            reader.onloadend = () => e.target.value = '';
             reader.onload = () => {
-                const array = fromCSV(reader.result);
+                const array: string[][] = fromCSV(reader.result as string);
 
-                // Map csv headers to internal attribute names
-                const header = array.shift().map(attr => {
-                    const attrs_map = {
+                const headers: string[] | undefined = array.shift();
+                if (!headers) return;
+
+                const mappedHeaders: (string | undefined)[] = headers.map(attr => {
+                    const attrs_map: any = {
                         'Count':            'qty',
                         'ID':               'id',
                         'Name':             'name',
@@ -61,17 +67,17 @@ function App() {
                     return attrs_map[attr];
                 });
 
-                // Convert list data to card objects
-                const cards = array.map(row => {
-                    const card = {};
-                    row.map((val,i) => card[header[i]] = val);
+                const cards: Card[] = array.map(row => {
+                    const card: any = {};
+                    for (let i in row) {
+                        const header = mappedHeaders[i];
+                        if (header) card[header] = row[i];
+                    }
                     return card;
                 });
 
                 setCards(cards);
             }
-
-            reader.readAsText(files[0]);
         }
     }
 
@@ -94,7 +100,7 @@ function App() {
     function handleEditCancel() {
         setEditIndex(null);
     }
-    function handleEditSave(newCard) {
+    function handleEditSave(newCard: Card) {
         // TODO: Save updated card to cards list
         console.log(newCard);
         setEditIndex(null);
@@ -107,7 +113,7 @@ function App() {
             <CardTable cards={cards} handleClick={setEditIndex}/>
             <br/>
             <div className={styles['buttons']}>
-                <button onClick={() => fileInput.current.click()}>Import</button>
+                <button onClick={() => fileInput.current && fileInput.current.click()}>Import</button>
                 <input id="input" type="file" ref={fileInput} onChange={readFile} hidden/>
                 <a href={outURL} download="cards.csv">
                     <button>Export</button>
@@ -115,7 +121,7 @@ function App() {
             </div>
             {
                 editIndex === null ? null :
-                <CardEditorPopup
+                <CardEditor
                     card={cards[editIndex]}
                     onDelete={handleEditDelete}
                     onCancel={handleEditCancel}
