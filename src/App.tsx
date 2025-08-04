@@ -100,8 +100,7 @@ function App(): ReactNode {
         setEditIndex(null);
     }
     function handleEditSave(newCard: Card) {
-        // TODO: Save updated card to cards list
-        console.log(newCard);
+        setCards(current => current.map((card, idx) => idx === editIndex ? newCard : card))
         setEditIndex(null);
     }
 
