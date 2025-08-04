@@ -1,7 +1,7 @@
 import styles from './CardSelector.module.css';
 import React, { useEffect, useState } from 'react';
 import type { ScryfallCard, ScryfallError, ScryfallList, ScryfallSearch } from '../utils/scryfall';
-import { encodeSearch, getMainImages } from '../utils/scryfall';
+import { encodeSearchURL, getMainImages } from '../utils/scryfall';
 
 interface CardSelectorProps {
     onSelect: (card: ScryfallCard) => void,
@@ -35,11 +35,12 @@ function CardSelector({ onSelect }: CardSelectorProps) {
 
         // If query is not empty, search for cards and add them to the results
         if (formVals.name || formVals.set || formVals.cn) {
-            let next_url: string | undefined = encodeSearch(search);
+            let next_url: string | undefined = encodeSearchURL(search);
             setTimeout(async () => {
                 try {
                     while (next_url) {
                         const response: Response = await fetch(next_url, {signal:controller.signal});
+                        console.log('fetched')
                         const json: ScryfallError | ScryfallList = await response.json();
 
                         if (json.object === 'error') {

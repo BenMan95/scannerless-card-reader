@@ -60,13 +60,21 @@ interface ScryfallSearch {
 
 const API_ENDPOINT = 'https://api.scryfall.com/cards';
 
-function encodeSearch(search: ScryfallSearch): string {
+function encodeSearchURL(search: ScryfallSearch): string {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(search))
         params.set(key, String(value))
     params.set('q', search.query.join(' '))
 
     return `${API_ENDPOINT}/search?${params.toString()}`
+}
+
+function encodeIdURL(id: string) {
+    return `${API_ENDPOINT}/${id}`
+}
+
+function encodeCodeNumURL(set_code: string, collector_number: string) {
+    return `${API_ENDPOINT}/${set_code}/${collector_number}`;
 }
 
 function getMainImages(card: ScryfallCard): ScryfallImages {
@@ -76,4 +84,4 @@ function getMainImages(card: ScryfallCard): ScryfallImages {
 }
 
 export type { ScryfallType, ScryfallError, ScryfallList, ScryfallCard, ScryfallImages, ScryfallSearch }
-export { encodeSearch, getMainImages }
+export { encodeSearchURL, encodeIdURL, encodeCodeNumURL, getMainImages }
