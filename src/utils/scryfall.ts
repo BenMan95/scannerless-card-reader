@@ -23,6 +23,7 @@ interface ScryfallCard {
     object: ScryfallType,
 
     id: string,
+    oracle_id: string,
     name: string;
     set: string,
     collector_number: string,
@@ -53,7 +54,7 @@ interface ScryfallSearch {
 
 const API_ENDPOINT = 'https://api.scryfall.com/cards';
 
-function encodeSearchURL(search: ScryfallSearch): string {
+function encodeSearchURL(search: ScryfallSearch) {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(search))
         params.set(key, String(value))
@@ -70,6 +71,23 @@ function encodeCodeNumURL(set_code: string, collector_number: string) {
     return `${API_ENDPOINT}/${set_code}/${collector_number}`;
 }
 
+async function* loadSearchResults(search: ScryfallSearch, signal?: AbortSignal): AsyncGenerator<ScryfallCard[]> {
+    let next_url: string | undefined = encodeSearchURL(search);
+    while (next_url) {
+        const response: Response = await fetch(next_url, {signal})
+        const json: ScryfallError | ScryfallList = await response.json();
+
+        if (json.object === 'error') {
+            const error = json as ScryfallError;
+            throw new Error(`${error.status} Error: ${error.code}\n${error.details}`);
+        }
+
+        const list = json as ScryfallList;
+        yield list.data;
+        next_url = list.next_page;
+    }
+}
+
 function getMainImages(card: ScryfallCard): ScryfallImages {
     if (card.image_uris)
         return card.image_uris;
@@ -77,4 +95,4 @@ function getMainImages(card: ScryfallCard): ScryfallImages {
 }
 
 export type { ScryfallType, ScryfallError, ScryfallList, ScryfallCard, ScryfallImages, ScryfallSearch }
-export { encodeSearchURL, encodeIdURL, encodeCodeNumURL, getMainImages }
+export { encodeSearchURL, encodeIdURL, encodeCodeNumURL, loadSearchResults, getMainImages }

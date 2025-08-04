@@ -1,7 +1,7 @@
 import styles from './CardSelector.module.css';
 import React, { useEffect, useState } from 'react';
-import type { ScryfallCard, ScryfallError, ScryfallList, ScryfallSearch } from '../utils/scryfall';
-import { encodeSearchURL, getMainImages } from '../utils/scryfall';
+import type { ScryfallCard, ScryfallSearch } from '../utils/scryfall';
+import { loadSearchResults, getMainImages } from '../utils/scryfall';
 
 interface CardSelectorProps {
     onSelect: (card: ScryfallCard) => void,
@@ -22,9 +22,10 @@ function CardSelector({ onSelect }: CardSelectorProps) {
         const controller: AbortController = new AbortController();
 
         const search: ScryfallSearch = {
-            query: ['not:digital'],
+            query: [],
             unique: 'prints',
             include_extras: true,
+            include_variations: true,
         }
         if (formVals.name) {
             const escaped: string = formVals.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -34,29 +35,17 @@ function CardSelector({ onSelect }: CardSelectorProps) {
         if (formVals.cn) search.query.push(`cn:'${formVals.cn}'`);
 
         // If query is not empty, search for cards and add them to the results
-        if (formVals.name || formVals.set || formVals.cn) {
-            let next_url: string | undefined = encodeSearchURL(search);
+        if (search.query.length) {
+            search.query.push('not:digital');
             setTimeout(async () => {
                 try {
-                    while (next_url) {
-                        const response: Response = await fetch(next_url, {signal:controller.signal});
-                        const json: ScryfallError | ScryfallList = await response.json();
-
-                        if (json.object === 'error') {
-                            const error = json as ScryfallError;
-                            alert(`${error.status} Error: ${error.code}\n${error.details}`);
-                            return;
-                        }
-
-                        const list = json as ScryfallList;
-                        setResults(current => [...current, ...list.data]);
-                        setHovered(current => current || list.data[0]);
-
-                        next_url = list.next_page;
+                    for await (const page of loadSearchResults(search, controller.signal)) {
+                        setResults(current => [...current, ...page])
+                        setHovered(current => current || page[0])
                     }
                 } catch (e) {
                     if (e instanceof Error && e.name !== 'AbortError') {
-                        console.log(e);
+                        alert(e.message);
                     }
                 }
             }, 500);
