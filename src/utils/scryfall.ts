@@ -19,7 +19,7 @@ interface ScryfallList {
     warnings?: string[],
 }
 
-interface BaseCard {
+interface ScryfallCard {
     object: ScryfallType,
 
     id: string,
@@ -30,16 +30,9 @@ interface BaseCard {
 
     finishes: string[],
     image_status: ScryfallImageStatus,
+    image_uris?: ScryfallImages,
+    card_faces?: { image_uris: ScryfallImages }[],
 }
-
-interface SingleFaceCard extends BaseCard {
-    image_uris: ScryfallImages,
-}
-interface DoubleFaceCard extends BaseCard {
-    card_faces: { image_uris: ScryfallImages }[],
-}
-
-type ScryfallCard = SingleFaceCard | DoubleFaceCard;
 
 interface ScryfallImages {
     small: string,
@@ -78,9 +71,9 @@ function encodeCodeNumURL(set_code: string, collector_number: string) {
 }
 
 function getMainImages(card: ScryfallCard): ScryfallImages {
-    if ('image_uris' in card)
-        return (card as SingleFaceCard).image_uris;
-    return (card as DoubleFaceCard).card_faces[0].image_uris;
+    if (card.image_uris)
+        return card.image_uris;
+    return card.card_faces![0].image_uris;
 }
 
 export type { ScryfallType, ScryfallError, ScryfallList, ScryfallCard, ScryfallImages, ScryfallSearch }
