@@ -40,7 +40,6 @@ function CardSelector({ onSelect }: CardSelectorProps) {
                 try {
                     while (next_url) {
                         const response: Response = await fetch(next_url, {signal:controller.signal});
-                        console.log('fetched')
                         const json: ScryfallError | ScryfallList = await response.json();
 
                         if (json.object === 'error') {
