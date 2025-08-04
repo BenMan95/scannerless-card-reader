@@ -22,21 +22,21 @@ function CardSelector({ onSelect }: CardSelectorProps) {
         const controller: AbortController = new AbortController();
 
         const search: ScryfallSearch = {
-            query: [],
+            q: [],
             unique: 'prints',
             include_extras: true,
             include_variations: true,
         }
         if (formVals.name) {
             const escaped: string = formVals.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            search.query.push(`name:/${escaped}/`);
+            search.q.push(`name:/${escaped}/`);
         }
-        if (formVals.set) search.query.push(`s:'${formVals.set}'`);
-        if (formVals.cn) search.query.push(`cn:'${formVals.cn}'`);
+        if (formVals.set) search.q.push(`s:'${formVals.set}'`);
+        if (formVals.cn) search.q.push(`cn:'${formVals.cn}'`);
 
         // If query is not empty, search for cards and add them to the results
-        if (search.query.length) {
-            search.query.push('not:digital');
+        if (search.q.length) {
+            search.q.push('not:digital');
             setTimeout(async () => {
                 try {
                     for await (const page of loadSearchResults(search, controller.signal)) {
@@ -118,8 +118,7 @@ function CardSelector({ onSelect }: CardSelectorProps) {
                 </div>
             </div>
             <div className={styles['small-cards']}>
-                {results.filter(card => card.image_status !== 'missing')
-                        .map(card => {
+                {results.map(card => {
                     return (<img className={styles['card']}
                                  src={getMainImages(card).small}
                                  key={card.id}

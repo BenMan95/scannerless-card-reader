@@ -14,20 +14,30 @@ div.background {
 
 div.window {
     opacity: 100%;
-    text-align: center;
     background-color: white;
     border-radius: 1em;
-    min-width: 20em;
-    height: 10em;
+    padding: 1em;
     
     display: flex;
     flex-direction: column;
 }
 
 div.main {
+    display: flex;
+    flex-direction: row;
+}
+
+img.card {
+    border-radius: 4.75% / 3.5%;
+    max-height: 20em;
+}
+
+div.options {
+    padding-left: 1em;
 }
 
 div.buttons {
+    padding-top: 1em;
     display: flex;
     flex-direction: row;
 }
@@ -47,8 +57,5 @@ div.buttons > div.right {
 }
 
 div.buttons > div {
-    margin: 1em;
     gap: 1em;
 }
-
-img.card { border-radius: 4.75% / 3.5% }

@@ -25,6 +25,7 @@ interface ScryfallCard {
     id: string,
     oracle_id: string,
     name: string;
+    set_name: string,
     set: string,
     collector_number: string,
     lang: string,
@@ -45,7 +46,7 @@ interface ScryfallImages {
 }
 
 interface ScryfallSearch {
-    query: string[],
+    q: string[],
     unique?: string,
     include_extras?: boolean,
     include_multilingual?: boolean,
@@ -58,7 +59,7 @@ function encodeSearchURL(search: ScryfallSearch) {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(search))
         params.set(key, String(value))
-    params.set('q', search.query.join(' '))
+    params.set('q', search.q.join(' '))
 
     return `${API_ENDPOINT}/search?${params.toString()}`
 }
@@ -79,7 +80,7 @@ async function* loadSearchResults(search: ScryfallSearch, signal?: AbortSignal):
 
         if (json.object === 'error') {
             const error = json as ScryfallError;
-            throw new Error(`${error.status} Error: ${error.code}\n${error.details}`);
+            throw new Error(`${error.status} ${error.code} error: ${error.details}`);
         }
 
         const list = json as ScryfallList;
