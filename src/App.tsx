@@ -1,5 +1,5 @@
 import styles from './App.module.css';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, type ReactNode } from 'react';
 import CardSelector from './components/CardSelector.tsx';
 import CardTable from './components/CardTable.tsx';
 import CardEditor from './components/CardEditorPopup.tsx';
@@ -7,7 +7,7 @@ import { toCSV, fromCSV } from './utils/csv.ts';
 import type { Card } from './utils/types.ts';
 import type { ScryfallCard } from './utils/scryfall';
 
-function App() {
+function App(): ReactNode {
     const [cards, setCards] = useState<Card[]>([]);
     const [outURL, setOutURL] = useState<string | undefined>(undefined);
     const [editIndex, setEditIndex] = useState<number | null>(null);

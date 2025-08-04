@@ -1,6 +1,7 @@
 import styles from './CardSelector.module.css';
 import React, { useEffect, useState } from 'react';
-import type { ScryfallCard, ScryfallError, ScryfallList } from '../utils/scryfall';
+import type { ScryfallCard, ScryfallError, ScryfallList, ScryfallSearch } from '../utils/scryfall';
+import { encodeSearch, getMainImages } from '../utils/scryfall';
 
 interface CardSelectorProps {
     onSelect: (card: ScryfallCard) => void,
@@ -20,18 +21,21 @@ function CardSelector({ onSelect }: CardSelectorProps) {
     useEffect(() => {
         const controller: AbortController = new AbortController();
 
-        const filters: string[] = [];
+        const search: ScryfallSearch = {
+            query: ['not:digital'],
+            unique: 'prints',
+            include_extras: true,
+        }
         if (formVals.name) {
             const escaped: string = formVals.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            filters.push(`name:/${escaped}/`);
+            search.query.push(`name:/${escaped}/`);
         }
-        if (formVals.set) filters.push(`s:'${formVals.set}'`);
-        if (formVals.cn) filters.push(`cn:'${formVals.cn}'`);
+        if (formVals.set) search.query.push(`s:'${formVals.set}'`);
+        if (formVals.cn) search.query.push(`cn:'${formVals.cn}'`);
 
         // If query is not empty, search for cards and add them to the results
         if (formVals.name || formVals.set || formVals.cn) {
-            const query: string = filters.join(' ');
-            let next_url: string | null = encodeURI(`https://api.scryfall.com/cards/search?unique=prints&q=not:digital include:extras ${query}`);
+            let next_url: string | undefined = encodeSearch(search);
             setTimeout(async () => {
                 try {
                     while (next_url) {
@@ -48,7 +52,7 @@ function CardSelector({ onSelect }: CardSelectorProps) {
                         setResults(current => [...current, ...list.data]);
                         setHovered(current => current || list.data[0]);
 
-                        next_url = list.has_more ? list.next_page : null;
+                        next_url = list.next_page;
                     }
                 } catch (e) {
                     if (e instanceof Error && e.name !== 'AbortError') {
@@ -120,16 +124,15 @@ function CardSelector({ onSelect }: CardSelectorProps) {
                 <div className={styles['big-card-container']}>
                     {hovered && (
                         <img className={`${styles['card']} ${styles['big-card']}`} alt="Selected Card"
-                             src={(hovered.image_uris ?? hovered.card_faces[0].image_uris).large}/>
+                             src={getMainImages(hovered).large}/>
                     )}
                 </div>
             </div>
             <div className={styles['small-cards']}>
                 {results.filter(card => card.image_status !== 'missing')
                         .map(card => {
-                    const images = card.image_uris ?? card.card_faces[0].image_uris;
                     return (<img className={styles['card']}
-                                 src={images.small}
+                                 src={getMainImages(card).small}
                                  key={card.id}
                                  alt={card.name}
                                  onMouseOver={() => setHovered(card)}
