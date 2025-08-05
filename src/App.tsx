@@ -178,16 +178,13 @@ function App(): ReactNode {
             <CardTable cards={cards} handleClick={handleEdit}/>
             <br/>
             <div className={styles['buttons']}>
-                <button onClick={() => fileInput.current && fileInput.current.click()}>Import</button>
+                <button onClick={() => fileInput.current?.click()}>Import</button>
                 <input id="input" type="file" ref={fileInput} onChange={readFile} hidden/>
                 <a href={outURL} download="cards.csv">
                     <button>Export</button>
                 </a>
             </div>
-            {
-                editorProps === null ? null :
-                <CardEditor {...editorProps}/>
-            }
+            {editorProps && <CardEditor {...editorProps}/>}
         </>
     );
 }
