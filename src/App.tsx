@@ -10,7 +10,6 @@ import type { ScryfallCard } from './utils/scryfall';
 function App(): ReactNode {
     const [cards, setCards] = useState<Card[]>([]);
     const [outURL, setOutURL] = useState<string | undefined>(undefined);
-    // const [editIndex, setEditIndex] = useState<number | null>(null);
     const [editorProps, setEditorProps] = useState<CardEditorProps | null>(null)
     const fileInput = useRef<HTMLInputElement>(null);
 
