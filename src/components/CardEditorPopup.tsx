@@ -4,7 +4,7 @@ import type { Card } from '../utils/types';
 import type { ScryfallCard, ScryfallSearch } from '../utils/scryfall';
 import { encodeIdURL, getMainImages, loadSearchResults } from '../utils/scryfall';
 
-interface CardEditorProps {
+export interface CardEditorProps {
     card: Card,
     onDelete: () => void,
     onCancel: () => void,
@@ -108,7 +108,13 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
                         <p>
                             <label htmlFor='quantity'>Quantity:</label>
                             <br/>
-                            <input name='quantity' type='number' value={newCard.qty} onChange={changeQuantity}></input>
+                            <input
+                                className={styles['quantity']}
+                                name='quantity'
+                                type='number'
+                                value={newCard.qty}
+                                onChange={changeQuantity}>
+                            </input>
                         </p>
                         <p>
                             <label htmlFor='printing'>Printing:</label>

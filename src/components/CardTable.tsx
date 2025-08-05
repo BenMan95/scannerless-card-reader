@@ -1,7 +1,7 @@
 import './CardTable.module.css';
 import type { Card } from '../utils/types';
 
-interface CardTableProps {
+export interface CardTableProps {
     cards: Card[],
     handleClick: (index: number) => void,
 }

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import type { ScryfallCard, ScryfallSearch } from '../utils/scryfall';
 import { loadSearchResults, getMainImages } from '../utils/scryfall';
 
-interface CardSelectorProps {
+export interface CardSelectorProps {
     onSelect: (card: ScryfallCard) => void,
 }
 

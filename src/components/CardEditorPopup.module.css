@@ -29,11 +29,15 @@ div.main {
 
 img.card {
     border-radius: 4.75% / 3.5%;
-    max-height: 20em;
+    max-height: 30em;
 }
 
 div.options {
     padding-left: 1em;
+}
+
+input.quantity {
+    max-width: 5em;
 }
 
 div.buttons {

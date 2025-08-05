@@ -1,8 +1,8 @@
 import styles from './App.module.css';
-import React, { useState, useRef, useEffect, type ReactNode } from 'react';
+import React, { useState, useRef, useEffect, type ReactNode, type JSXElementConstructor } from 'react';
 import CardSelector from './components/CardSelector.tsx';
 import CardTable from './components/CardTable.tsx';
-import CardEditor from './components/CardEditorPopup.tsx';
+import CardEditor, { type CardEditorProps } from './components/CardEditorPopup.tsx';
 import { toCSV, fromCSV } from './utils/csv.ts';
 import type { Card } from './utils/types.ts';
 import type { ScryfallCard } from './utils/scryfall';
@@ -10,7 +10,8 @@ import type { ScryfallCard } from './utils/scryfall';
 function App(): ReactNode {
     const [cards, setCards] = useState<Card[]>([]);
     const [outURL, setOutURL] = useState<string | undefined>(undefined);
-    const [editIndex, setEditIndex] = useState<number | null>(null);
+    // const [editIndex, setEditIndex] = useState<number | null>(null);
+    const [editorProps, setEditorProps] = useState<CardEditorProps | null>(null)
     const fileInput = useRef<HTMLInputElement>(null);
 
     function addCard(newCard: ScryfallCard) {
@@ -92,23 +93,28 @@ function App(): ReactNode {
         return () => URL.revokeObjectURL(url);
     }, [cards]);
 
-    function handleEditDelete() {
-        setCards(current => current.filter((_, index) => index !== editIndex));
-        setEditIndex(null);
-    }
-    function handleEditCancel() {
-        setEditIndex(null);
-    }
-    function handleEditSave(newCard: Card) {
-        setCards(current => current.map((card, idx) => idx === editIndex ? newCard : card))
-        setEditIndex(null);
+    function handleEdit(editIndex: number) {
+        const props: CardEditorProps = {
+            card: cards[editIndex],
+            onDelete: () => {
+                setCards(current => current.filter((_, idx) => idx !== editIndex));
+                setEditorProps(null);
+            },
+            onCancel: () => setEditorProps(null),
+            onSave: (newCard: Card) => {
+                setCards(current => current.map((card, idx) => idx === editIndex ? newCard : card))
+                setEditorProps(null);
+            },
+        }
+
+        setEditorProps(props)
     }
 
     return (
         <>
             <CardSelector onSelect={addCard}/>
             <br/>
-            <CardTable cards={cards} handleClick={setEditIndex}/>
+            <CardTable cards={cards} handleClick={handleEdit}/>
             <br/>
             <div className={styles['buttons']}>
                 <button onClick={() => fileInput.current && fileInput.current.click()}>Import</button>
@@ -118,13 +124,8 @@ function App(): ReactNode {
                 </a>
             </div>
             {
-                editIndex === null ? null :
-                <CardEditor
-                    card={cards[editIndex]}
-                    onDelete={handleEditDelete}
-                    onCancel={handleEditCancel}
-                    onSave={handleEditSave}
-                />
+                editorProps === null ? null :
+                <CardEditor {...editorProps}/>
             }
         </>
     );
