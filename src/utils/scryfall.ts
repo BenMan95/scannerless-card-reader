@@ -92,7 +92,16 @@ async function* loadSearchResults(search: ScryfallSearch, signal?: AbortSignal):
 function getMainImages(card: ScryfallCard): ScryfallImages {
     if (card.image_uris)
         return card.image_uris;
-    return card.card_faces![0].image_uris;
+    if (card.card_faces)
+        return card.card_faces[0].image_uris;
+    return {
+        small: 'https://errors.scryfall.com/soon.jpg',
+        normal: 'https://errors.scryfall.com/soon.jpg',
+        large: 'https://errors.scryfall.com/soon.jpg',
+        png: 'https://errors.scryfall.com/soon.jpg',
+        art_crop: 'https://errors.scryfall.com/soon.jpg',
+        border_crop: 'https://errors.scryfall.com/soon.jpg',
+    }
 }
 
 export type { ScryfallType, ScryfallError, ScryfallList, ScryfallCard, ScryfallImages, ScryfallSearch }
