@@ -13,28 +13,29 @@ function App(): ReactNode {
     const [editorProps, setEditorProps] = useState<CardEditorProps | null>(null)
     const fileInput = useRef<HTMLInputElement>(null);
 
-    function addCard(newCard: ScryfallCard) {
+    function addCard(cardData: ScryfallCard) {
+        const newCard: Card = {
+            qty:    1,
+            id:     cardData.id,
+            name:   cardData.name,
+            set:    cardData.set,
+            cn:     cardData.collector_number,
+            lang:   cardData.lang,
+            finish: cardData.finishes[0],
+        };
+
         setCards(current => {
-            const newCards = [...current];
-
-            for (const card of newCards) {
-                if (card.id === newCard.id) {
-                    card.qty += 1;
-                    return newCards;
+            let isDuplicate = false;
+            const newCards = current.map(card => {
+                if (card.id === newCard.id && card.finish === newCard.finish) {
+                    isDuplicate = true;
+                    return {...card, qty: card.qty + newCard.qty};
                 }
-            }
 
-            const row = {
-                qty:    1,
-                id:     newCard.id,
-                name:   newCard.name,
-                set:    newCard.set,
-                cn:     newCard.collector_number,
-                lang:   newCard.lang,
-                finish: newCard.finishes[0],
-            };
+                return card;
+            })
 
-            newCards.push(row);
+            if (!isDuplicate) newCards.push(newCard);
             return newCards;
         });
     }
@@ -105,14 +106,16 @@ function App(): ReactNode {
                     let isDuplicate = false;
 
                     const newCards = current.map((card, idx) => {
-                        if (idx === editIndex) {
+                        if (idx === editIndex)
                             return newCard;
-                        } else if (card.id === newCard.id && card.finish === newCard.finish) {
+
+                        if (card.id === newCard.id && card.finish === newCard.finish) {
                             isDuplicate = true;
                             return {...card, qty: card.qty + newCard.qty};
-                        } else {
-                            return card;
+
                         }
+
+                        return card;
                     });
 
                     if (isDuplicate) newCards.splice(editIndex, 1);

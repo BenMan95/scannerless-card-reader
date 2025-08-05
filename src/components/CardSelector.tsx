@@ -4,7 +4,8 @@ import type { ScryfallCard, ScryfallSearch } from '../utils/scryfall';
 import { loadSearchResults, getMainImages } from '../utils/scryfall';
 
 export interface CardSelectorProps {
-    onSelect: (card: ScryfallCard) => void,
+    // onSelect function can return true to avoid clearing fields
+    onSelect: (card: ScryfallCard) => boolean | void,
 }
 
 interface FormVals {
@@ -76,10 +77,7 @@ function CardSelector({ onSelect }: CardSelectorProps) {
     // When a card is selected, run the passed onSelect function
     // and reset the form values
     function selectCard(card: ScryfallCard) {
-        if (card != null) {
-            onSelect(card);
-        }
-
+        if (onSelect(card)) return;
         setVals({name:'', set:'', cn:''});
         setResults([]);
         setHovered(null);
