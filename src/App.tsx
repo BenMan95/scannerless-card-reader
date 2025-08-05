@@ -155,21 +155,20 @@ function App(): ReactNode {
                         if (card.id === newCard.id && card.finish === newCard.finish) {
                             isDuplicate = true;
                             return {...card, qty: card.qty + newCard.qty};
-
                         }
 
                         return card;
                     });
 
                     if (isDuplicate) newCards.splice(editIndex, 1);
-
                     return newCards;
                 })
+
                 setEditorProps(null);
             },
         }
 
-        setEditorProps(props)
+        setEditorProps(props);
     }
 
     return (
