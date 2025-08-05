@@ -63,15 +63,15 @@ function CardSelector({ onSelect }: CardSelectorProps) {
     // Functions for updating and checking form values
     function updateName(e: React.ChangeEvent<HTMLInputElement>) {
         const newVal: string = e.target.value;
-        setVals({...formVals, name:newVal})
+        setVals(oldVals => ({...oldVals, name: newVal}))
     }
     function updateSet(e: React.ChangeEvent<HTMLInputElement>) {
         const newVal: string = e.target.value.replaceAll(' ','');
-        setVals({...formVals, set:newVal})
+        setVals(oldVals => ({...oldVals, set: newVal}))
     }
     function updateCN(e: React.ChangeEvent<HTMLInputElement>) {
         const newVal: string = e.target.value.replaceAll(' ','');
-        setVals({...formVals, cn:newVal})
+        setVals(oldVals => ({...oldVals, cn: newVal}))
     }
 
     // When a card is selected, run the passed onSelect function
