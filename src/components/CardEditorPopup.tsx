@@ -83,14 +83,14 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
         const index = e.target.selectedIndex;
         const newData = printingOptions[index];
         setCardData(newData);
-        setNewCard({...newCard, set: newData.set, cn: newData.collector_number});
+        setNewCard({...newCard, id: newData.id, set: newData.set, cn: newData.collector_number});
     }
 
     function changeLanguage(e: React.ChangeEvent<HTMLSelectElement>) {
         const index = e.target.selectedIndex;
         const newData = languageOptions[index];
         setCardData(newData);
-        setNewCard({...newCard, lang: newData.lang});
+        setNewCard({...newCard, id: newData.id, lang: newData.lang});
     }
 
     function changeFinish(e: React.ChangeEvent<HTMLSelectElement>) {
