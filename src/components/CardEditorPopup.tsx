@@ -1,5 +1,5 @@
 import styles from './CardEditorPopup.module.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import type { Card } from '../utils/types';
 import type { ScryfallCard, ScryfallSearch } from '../utils/scryfall';
 import { encodeIdURL, getMainImages, loadSearchResults } from '../utils/scryfall';
@@ -16,6 +16,7 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
     const [cardData, setCardData] = useState<ScryfallCard | null>(null);
     const [printingOptions, setPrintingOptions] = useState<ScryfallCard[]>([]);
     const [languageOptions, setLanguageOptions] = useState<ScryfallCard[]>([]);
+    const form = useRef<HTMLFormElement>(null)
 
     useEffect(() => {
         const controller: AbortController = new AbortController();
@@ -41,11 +42,22 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
             }
         });
 
+
+        function downHandler(e: KeyboardEvent) {
+            if (onCancel && e.key === 'Escape') onCancel();
+        }
+
+        addEventListener('keydown', downHandler);
         return () => {
             controller.abort();
             setPrintingOptions([]);
+            removeEventListener('keydown', downHandler);
         }
     }, []);
+
+    useEffect(() => {
+        console.log(newCard)
+    }, [newCard])
 
     useEffect(() => {
         if (!cardData) return;
@@ -99,12 +111,17 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
         setNewCard({...newCard, finish});
     }
 
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        if (onSave) onSave(newCard);
+    }
+
     return (
         <div className={styles['background']}>
             <div className={styles['window']}>
                 <div className={styles['main']}>
                     <img className={styles['card']} src={cardData ? getMainImages(cardData).large : undefined}></img>
-                    <div className={styles['options']}>
+                    <form className={styles['options']} onSubmit={handleSubmit} ref={form}>
                         <p>
                             <label htmlFor='quantity'>Quantity:</label>
                             <br/>
@@ -113,7 +130,8 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
                                 name='quantity'
                                 type='number'
                                 value={newCard.qty}
-                                onChange={changeQuantity}>
+                                onChange={changeQuantity}
+                                autoFocus>
                             </input>
                         </p>
                         <p>
@@ -149,15 +167,16 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
                                 ))}
                             </select>
                         </p>
-                    </div>
+                        <input type="submit" hidden/>
+                    </form>
                 </div>
                 <div className={styles['buttons']}>
                     <div className={styles['left']}>
                         {onDelete && <button onClick={onDelete}>Delete</button>}
                     </div>
                     <div className={styles['right']}>
-                        {onSave && <button onClick={() => onSave(newCard)}>Save</button>}
                         {onCancel && <button onClick={onCancel}>Cancel</button>}
+                        {onSave && <button onClick={() => onSave(newCard)}>Save</button>}
                     </div>
                 </div>
             </div>
