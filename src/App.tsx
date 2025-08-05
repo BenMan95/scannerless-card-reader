@@ -101,7 +101,24 @@ function App(): ReactNode {
             },
             onCancel: () => setEditorProps(null),
             onSave: (newCard: Card) => {
-                setCards(current => current.map((card, idx) => idx === editIndex ? newCard : card))
+                setCards(current => {
+                    let isDuplicate = false;
+
+                    const newCards = current.map((card, idx) => {
+                        if (idx === editIndex) {
+                            return newCard;
+                        } else if (card.id === newCard.id && card.finish === newCard.finish) {
+                            isDuplicate = true;
+                            return {...card, qty: card.qty + newCard.qty};
+                        } else {
+                            return card;
+                        }
+                    });
+
+                    if (isDuplicate) newCards.splice(editIndex, 1);
+
+                    return newCards;
+                })
                 setEditorProps(null);
             },
         }
