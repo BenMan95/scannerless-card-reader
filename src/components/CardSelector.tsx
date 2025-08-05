@@ -23,7 +23,7 @@ function CardSelector({ onSelect }: CardSelectorProps) {
         const controller: AbortController = new AbortController();
 
         const search: ScryfallSearch = {
-            q: [],
+            q: ['not:digital'],
             unique: 'prints',
             include_extras: true,
             include_variations: true,
@@ -36,8 +36,7 @@ function CardSelector({ onSelect }: CardSelectorProps) {
         if (formVals.cn) search.q.push(`cn:'${formVals.cn}'`);
 
         // If query is not empty, search for cards and add them to the results
-        if (search.q.length) {
-            search.q.push('not:digital');
+        if (search.q.length > 1) {
             setTimeout(async () => {
                 try {
                     for await (const page of loadSearchResults(search, controller.signal)) {
