@@ -6,9 +6,9 @@ import { encodeIdURL, getMainImages, loadSearchResults } from '../utils/scryfall
 
 export interface CardEditorProps {
     card: Card,
-    onDelete: () => void,
-    onCancel: () => void,
-    onSave: (newCard: Card) => void,
+    onDelete?: () => void,
+    onCancel?: () => void,
+    onSave?: (newCard: Card) => void,
 }
 
 function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
@@ -153,11 +153,11 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
                 </div>
                 <div className={styles['buttons']}>
                     <div className={styles['left']}>
-                        <button onClick={onDelete}>Delete</button>
+                        {onDelete && <button onClick={onDelete}>Delete</button>}
                     </div>
                     <div className={styles['right']}>
-                        <button onClick={() => onSave(newCard)}>Save</button>
-                        <button onClick={onCancel}>Cancel</button>
+                        {onSave && <button onClick={() => onSave(newCard)}>Save</button>}
+                        {onCancel && <button onClick={onCancel}>Cancel</button>}
                     </div>
                 </div>
             </div>
