@@ -1,6 +1,6 @@
 import styles from './App.module.css';
 import React, { useState, useRef, useEffect, type ReactNode } from 'react';
-import CardSelector from './components/CardSelector.tsx';
+import CardSelector, { type CardSelectorController } from './components/CardSelector.tsx';
 import CardTable from './components/CardTable.tsx';
 import CardEditor, { type CardEditorProps } from './components/CardEditorPopup.tsx';
 import { toCSV, fromCSV } from './utils/csv.ts';
@@ -11,10 +11,46 @@ function App(): ReactNode {
     const [cards, setCards] = useState<Card[]>([]);
     const [outURL, setOutURL] = useState<string | undefined>(undefined);
     const [editorProps, setEditorProps] = useState<CardEditorProps | null>(null)
+    const [shiftHeld, setShiftHeld] = useState<boolean>(false);
     const fileInput = useRef<HTMLInputElement>(null);
+    const selectorController = useRef<CardSelectorController>(null);
+
+    useEffect(() => {
+        function downHandler(e: KeyboardEvent) {
+            if (e.key === 'Shift') setShiftHeld(true);
+        }
+
+        function upHandler(e: KeyboardEvent) {
+            if (e.key === 'Shift') setShiftHeld(false);
+        }
+
+        window.addEventListener('keydown', downHandler);
+        window.addEventListener('keyup', upHandler);
+        return () => {
+            window.removeEventListener('keydown', downHandler);
+            window.removeEventListener('keyup', upHandler);
+        };
+    }, []);
 
     function addCard(cardData: ScryfallCard) {
-        const newCard: Card = {
+        function checkDuplicatesAndAdd(newCard: Card) {
+            setCards(current => {
+                let isDuplicate = false;
+                const newCards = current.map(card => {
+                    if (card.id === newCard.id && card.finish === newCard.finish) {
+                        isDuplicate = true;
+                        return {...card, qty: card.qty + newCard.qty};
+                    }
+
+                    return card;
+                })
+
+                if (!isDuplicate) newCards.push(newCard);
+                return newCards;
+            });
+        }
+
+        let newCard: Card = {
             qty:    1,
             id:     cardData.id,
             name:   cardData.name,
@@ -24,20 +60,27 @@ function App(): ReactNode {
             finish: cardData.finishes[0],
         };
 
-        setCards(current => {
-            let isDuplicate = false;
-            const newCards = current.map(card => {
-                if (card.id === newCard.id && card.finish === newCard.finish) {
-                    isDuplicate = true;
-                    return {...card, qty: card.qty + newCard.qty};
-                }
+        if (shiftHeld) {
+            const props: CardEditorProps = {
+                card: newCard,
+                onCancel: () => {
+                    setEditorProps(null);
+                    selectorController.current!.focus();
+                },
+                onSave: (editedCard) => {
+                    checkDuplicatesAndAdd(editedCard);
+                    setEditorProps(null);
+                    selectorController.current!.focus();
+                    selectorController.current!.clear();
+                },
+            }
 
-                return card;
-            })
-
-            if (!isDuplicate) newCards.push(newCard);
-            return newCards;
-        });
+            setEditorProps(props)
+        } else {
+            checkDuplicatesAndAdd(newCard);
+            selectorController.current!.focus();
+            selectorController.current!.clear();
+        }
     }
 
     async function readFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -131,7 +174,7 @@ function App(): ReactNode {
 
     return (
         <>
-            <CardSelector onSelect={addCard}/>
+            <CardSelector onSelect={addCard} controller={selectorController}/>
             <br/>
             <CardTable cards={cards} handleClick={handleEdit}/>
             <br/>

@@ -56,10 +56,6 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
     }, []);
 
     useEffect(() => {
-        console.log(newCard)
-    }, [newCard])
-
-    useEffect(() => {
         if (!cardData) return;
 
         const search: ScryfallSearch = {

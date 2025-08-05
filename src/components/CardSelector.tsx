@@ -1,11 +1,16 @@
 import styles from './CardSelector.module.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import type { ScryfallCard, ScryfallSearch } from '../utils/scryfall';
 import { loadSearchResults, getMainImages } from '../utils/scryfall';
 
 export interface CardSelectorProps {
-    // onSelect function can return true to avoid clearing fields
-    onSelect: (card: ScryfallCard) => boolean | void,
+    onSelect: (card: ScryfallCard) => void,
+    controller?: React.RefObject<CardSelectorController | null>,
+}
+
+export interface CardSelectorController {
+    focus: () => void,
+    clear: () => void,
 }
 
 interface FormVals {
@@ -14,10 +19,22 @@ interface FormVals {
     cn: string,
 }
 
-function CardSelector({ onSelect }: CardSelectorProps) {
+function CardSelector({ onSelect, controller }: CardSelectorProps) {
     const [formVals, setVals] = useState<FormVals>({name:'', set:'', cn:''});
     const [results, setResults] = useState<ScryfallCard[]>([]);
     const [hovered, setHovered] = useState<ScryfallCard | null>(null);
+    const nameInput = useRef<HTMLInputElement>(null)
+
+    if (controller && nameInput.current) {
+        controller.current = {
+            focus: () => nameInput.current!.focus(),
+            clear: () => {
+                setVals({name:'', set:'', cn:''});
+                setResults([]);
+                setHovered(null);
+            }
+        }
+    }
 
     useEffect(() => {
         const controller: AbortController = new AbortController();
@@ -73,20 +90,11 @@ function CardSelector({ onSelect }: CardSelectorProps) {
         setVals(oldVals => ({...oldVals, cn: newVal}))
     }
 
-    // When a card is selected, run the passed onSelect function
-    // and reset the form values
-    function selectCard(card: ScryfallCard) {
-        if (onSelect(card)) return;
-        setVals({name:'', set:'', cn:''});
-        setResults([]);
-        setHovered(null);
-    }
-
     // When submitted through the form, select the hovered card
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (hovered !== null)
-            selectCard(hovered);
+            onSelect(hovered);
     }
 
     return (
@@ -95,7 +103,8 @@ function CardSelector({ onSelect }: CardSelectorProps) {
                 <form className={styles['search']} autoComplete="off" onSubmit={handleSubmit}>
                     <p>
                         <label htmlFor="name">Card Name: </label>
-                        <input value={formVals.name} name="name" placeholder="Card Name" onChange={updateName} autoFocus/>
+                        <input value={formVals.name} name="name" placeholder="Card Name" onChange={updateName}
+                               ref={nameInput} autoFocus/>
                     </p>
                     <p>
                         <label htmlFor="set">Set Code: </label>
@@ -121,7 +130,7 @@ function CardSelector({ onSelect }: CardSelectorProps) {
                                  key={card.id}
                                  alt={card.name}
                                  onMouseOver={() => setHovered(card)}
-                                 onClick={() => selectCard(card)}/>)
+                                 onClick={() => onSelect(card)}/>)
                 })}
             </div>
         </div>
