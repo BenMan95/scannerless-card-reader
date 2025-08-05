@@ -1,5 +1,5 @@
 import styles from './App.module.css';
-import React, { useState, useRef, useEffect, type ReactNode, type JSXElementConstructor } from 'react';
+import React, { useState, useRef, useEffect, type ReactNode } from 'react';
 import CardSelector from './components/CardSelector.tsx';
 import CardTable from './components/CardTable.tsx';
 import CardEditor, { type CardEditorProps } from './components/CardEditorPopup.tsx';
