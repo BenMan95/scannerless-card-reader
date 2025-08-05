@@ -90,18 +90,25 @@ async function* loadSearchResults(search: ScryfallSearch, signal?: AbortSignal):
 }
 
 function getMainImages(card: ScryfallCard): ScryfallImages {
-    if (card.image_uris)
-        return card.image_uris;
-    if (card.card_faces)
-        return card.card_faces[0].image_uris;
-    return {
-        small: 'https://errors.scryfall.com/soon.jpg',
-        normal: 'https://errors.scryfall.com/soon.jpg',
-        large: 'https://errors.scryfall.com/soon.jpg',
-        png: 'https://errors.scryfall.com/soon.jpg',
-        art_crop: 'https://errors.scryfall.com/soon.jpg',
-        border_crop: 'https://errors.scryfall.com/soon.jpg',
+    let retVal;
+    if (card.image_uris) {
+        retVal = card.image_uris;
+    } else if (card.card_faces) {
+        retVal = card.card_faces[0].image_uris;
     }
+
+    if (!retVal) {
+        retVal = {
+            small: 'https://errors.scryfall.com/soon.jpg',
+            normal: 'https://errors.scryfall.com/soon.jpg',
+            large: 'https://errors.scryfall.com/soon.jpg',
+            png: 'https://errors.scryfall.com/soon.jpg',
+            art_crop: 'https://errors.scryfall.com/soon.jpg',
+            border_crop: 'https://errors.scryfall.com/soon.jpg',
+        }
+    }
+
+    return retVal;
 }
 
 export type { ScryfallType, ScryfallError, ScryfallList, ScryfallCard, ScryfallImages, ScryfallSearch }
