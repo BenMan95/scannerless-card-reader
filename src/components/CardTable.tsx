@@ -1,12 +1,12 @@
 import './CardTable.module.css';
-import type { Card } from '../utils/types';
+import type { Row } from '../utils/types';
 
 export interface CardTableProps {
-    cards: Card[],
+    rows: Row[],
     handleClick: (index: number) => void,
 }
 
-function CardTable({ cards, handleClick }: CardTableProps) {
+function CardTable({ rows, handleClick }: CardTableProps) {
     return (
         <table>
             <thead>
@@ -20,7 +20,7 @@ function CardTable({ cards, handleClick }: CardTableProps) {
                 </tr>
             </thead>
             <tbody>
-                {cards.map((card, index) => (
+                {rows.map((card, index) => (
                     <tr key={index} onClick={() => handleClick(index)}>
                         <td>{card.qty}</td>
                         <td>{card.name}</td>

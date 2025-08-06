@@ -1,4 +1,4 @@
-interface Card {
+interface Row {
     qty: number,
     id: string,
     name: string,
@@ -8,4 +8,4 @@ interface Card {
     finish: string,
 }
 
-export type { Card };
+export type { Row };

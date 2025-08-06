@@ -2,15 +2,15 @@ import styles from './App.module.css';
 import React, { useState, useRef, useEffect, type ReactNode } from 'react';
 import CardSelector, { type CardSelectorController } from './components/CardSelector.tsx';
 import CardTable from './components/CardTable.tsx';
-import CardEditor, { type CardEditorProps } from './components/CardEditorPopup.tsx';
+import RowEditor, { type RowEditorProps } from './components/RowEditorPopup.tsx';
 import { toCSV, fromCSV } from './utils/csv.ts';
-import type { Card } from './utils/types.ts';
+import type { Row } from './utils/types.ts';
 import type { ScryfallCard } from './utils/scryfall';
 
 function App(): ReactNode {
-    const [cards, setCards] = useState<Card[]>([]);
+    const [rows, setRows] = useState<Row[]>([]);
     const [outURL, setOutURL] = useState<string | undefined>(undefined);
-    const [editorProps, setEditorProps] = useState<CardEditorProps | null>(null)
+    const [editorProps, setEditorProps] = useState<RowEditorProps | null>(null)
     const [shiftHeld, setShiftHeld] = useState<boolean>(false);
     const fileInput = useRef<HTMLInputElement>(null);
     const selectorController = useRef<CardSelectorController>(null);
@@ -32,25 +32,24 @@ function App(): ReactNode {
         };
     }, []);
 
-    function addCard(cardData: ScryfallCard) {
-        function checkDuplicatesAndAdd(newCard: Card) {
-            setCards(current => {
-                let isDuplicate = false;
-                const newCards = current.map(card => {
-                    if (card.id === newCard.id && card.finish === newCard.finish) {
-                        isDuplicate = true;
-                        return {...card, qty: card.qty + newCard.qty};
+    function addRow(cardData: ScryfallCard) {
+        function checkDuplicatesAndAdd(newRow: Row) {
+            setRows(current => {
+                const newRowCopy: Row = {...newRow};
+                const newRows = current.filter(row => {
+                    if (row.id === newRow.id && row.finish === newRow.finish) {
+                        newRowCopy.qty += row.qty;
+                        return false;
                     }
-
-                    return card;
+                    return true;
                 })
 
-                if (!isDuplicate) newCards.push(newCard);
-                return newCards;
+                newRows.unshift(newRowCopy);
+                return newRows;
             });
         }
 
-        let newCard: Card = {
+        let newRow: Row = {
             qty:    1,
             id:     cardData.id,
             name:   cardData.name,
@@ -61,14 +60,14 @@ function App(): ReactNode {
         };
 
         if (shiftHeld) {
-            const props: CardEditorProps = {
-                card: newCard,
+            const props: RowEditorProps = {
+                row: newRow,
                 onCancel: () => {
                     setEditorProps(null);
                     selectorController.current!.focus();
                 },
-                onSave: (editedCard) => {
-                    checkDuplicatesAndAdd(editedCard);
+                onSave: (editedRow) => {
+                    checkDuplicatesAndAdd(editedRow);
                     setEditorProps(null);
                     selectorController.current!.focus();
                     selectorController.current!.clear();
@@ -77,7 +76,7 @@ function App(): ReactNode {
 
             setEditorProps(props)
         } else {
-            checkDuplicatesAndAdd(newCard);
+            checkDuplicatesAndAdd(newRow);
             selectorController.current!.focus();
             selectorController.current!.clear();
         }
@@ -98,7 +97,7 @@ function App(): ReactNode {
                 if (!headers) return;
 
                 const mappedHeaders: (string | undefined)[] = headers.map(attr => {
-                    const attrs_map: any = {
+                    const attrs_map: Record<string, string> = {
                         'Count':            'qty',
                         'ID':               'id',
                         'Name':             'name',
@@ -110,22 +109,23 @@ function App(): ReactNode {
                     return attrs_map[attr];
                 });
 
-                const cards: Card[] = array.map(row => {
-                    const card: any = {};
-                    for (const i in row) {
+                const rows: Row[] = array.map(inputRow => {
+                    const rowObj: any = {};
+                    for (const i in inputRow) {
                         const header = mappedHeaders[i];
-                        if (header) card[header] = row[i];
+                        if (header) rowObj[header] = inputRow[i];
                     }
-                    return card;
+                    rowObj.qty = parseInt(rowObj.qty);
+                    return rowObj;
                 });
 
-                setCards(cards);
+                setRows(rows);
             }
         }
     }
 
     useEffect(() => {
-        const array = cards.map(card => [card.qty, card.id, card.name, card.set, card.cn, card.lang, card.finish]);
+        const array = rows.map(card => [card.qty, card.id, card.name, card.set, card.cn, card.lang, card.finish]);
         array.unshift(['Count', 'ID', 'Name', 'Edition', 'Collector Number', 'Language', 'Foil']);
 
         const csv = toCSV(array);
@@ -134,34 +134,30 @@ function App(): ReactNode {
 
         setOutURL(url);
         return () => URL.revokeObjectURL(url);
-    }, [cards]);
+    }, [rows]);
 
     function handleEdit(editIndex: number) {
-        const props: CardEditorProps = {
-            card: cards[editIndex],
+        const props: RowEditorProps = {
+            row: rows[editIndex],
             onDelete: () => {
-                setCards(current => current.filter((_, idx) => idx !== editIndex));
+                setRows(current => current.filter((_, idx) => idx !== editIndex));
                 setEditorProps(null);
             },
             onCancel: () => setEditorProps(null),
-            onSave: (newCard: Card) => {
-                setCards(current => {
-                    let isDuplicate = false;
-
-                    const newCards = current.map((card, idx) => {
+            onSave: (newRow: Row) => {
+                setRows(current => {
+                    const newRowCopy: Row = {...newRow};
+                    return current.map((row, idx) => {
                         if (idx === editIndex)
-                            return newCard;
+                            return newRowCopy;
 
-                        if (card.id === newCard.id && card.finish === newCard.finish) {
-                            isDuplicate = true;
-                            return {...card, qty: card.qty + newCard.qty};
+                        if (row.id === newRow.id && row.finish === newRow.finish) {
+                            newRowCopy.qty += row.qty;
+                            return null;
                         }
 
-                        return card;
-                    });
-
-                    if (isDuplicate) newCards.splice(editIndex, 1);
-                    return newCards;
+                        return row;
+                    }).filter(row => row !== null)
                 })
 
                 setEditorProps(null);
@@ -173,9 +169,9 @@ function App(): ReactNode {
 
     return (
         <>
-            <CardSelector onSelect={addCard} controller={selectorController}/>
+            <CardSelector onSelect={addRow} controller={selectorController}/>
             <br/>
-            <CardTable cards={cards} handleClick={handleEdit}/>
+            <CardTable rows={rows} handleClick={handleEdit}/>
             <br/>
             <div className={styles['buttons']}>
                 <button onClick={() => fileInput.current?.click()}>Import</button>
@@ -184,7 +180,7 @@ function App(): ReactNode {
                     <button>Export</button>
                 </a>
             </div>
-            {editorProps && <CardEditor {...editorProps}/>}
+            {editorProps && <RowEditor {...editorProps}/>}
         </>
     );
 }

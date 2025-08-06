@@ -1,18 +1,18 @@
-import styles from './CardEditorPopup.module.css';
+import styles from './RowEditorPopup.module.css';
 import React, { useEffect, useState, useRef } from 'react';
-import type { Card } from '../utils/types';
+import type { Row } from '../utils/types';
 import type { ScryfallCard, ScryfallSearch } from '../utils/scryfall';
 import { encodeIdURL, getMainImages, loadSearchResults } from '../utils/scryfall';
 
-export interface CardEditorProps {
-    card: Card,
+export interface RowEditorProps {
+    row: Row,
     onDelete?: () => void,
     onCancel?: () => void,
-    onSave?: (newCard: Card) => void,
+    onSave?: (newCard: Row) => void,
 }
 
-function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
-    const [newCard, setNewCard] = useState<Card>({...card});
+function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
+    const [newRow, setNewRow] = useState<Row>({...row});
     const [cardData, setCardData] = useState<ScryfallCard | null>(null);
     const [printingOptions, setPrintingOptions] = useState<ScryfallCard[]>([]);
     const [languageOptions, setLanguageOptions] = useState<ScryfallCard[]>([]);
@@ -21,7 +21,7 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
     useEffect(() => {
         const controller: AbortController = new AbortController();
 
-        fetch(encodeIdURL(card.id), {signal: controller.signal})
+        fetch(encodeIdURL(row.id), {signal: controller.signal})
         .then(resp => resp.json())
         .then(async (card: ScryfallCard) => {
             setCardData(card);
@@ -84,32 +84,32 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
 
     function changeQuantity(e: React.ChangeEvent<HTMLInputElement>) {
         const newVal: number = parseInt(e.target.value);
-        setNewCard({...newCard, qty: newVal});
+        setNewRow({...newRow, qty: newVal});
     }
 
     function changePrinting(e: React.ChangeEvent<HTMLSelectElement>) {
         const index = e.target.selectedIndex;
         const newData = printingOptions[index];
         setCardData(newData);
-        setNewCard({...newCard, id: newData.id, set: newData.set, cn: newData.collector_number});
+        setNewRow({...newRow, id: newData.id, set: newData.set, cn: newData.collector_number});
     }
 
     function changeLanguage(e: React.ChangeEvent<HTMLSelectElement>) {
         const index = e.target.selectedIndex;
         const newData = languageOptions[index];
         setCardData(newData);
-        setNewCard({...newCard, id: newData.id, lang: newData.lang});
+        setNewRow({...newRow, id: newData.id, lang: newData.lang});
     }
 
     function changeFinish(e: React.ChangeEvent<HTMLSelectElement>) {
         const index = e.target.selectedIndex;
         const finish = cardData!.finishes[index];
-        setNewCard({...newCard, finish});
+        setNewRow({...newRow, finish});
     }
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        if (onSave) onSave(newCard);
+        if (onSave) onSave(newRow);
     }
 
     return (
@@ -125,7 +125,7 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
                                 className={styles['quantity']}
                                 name='quantity'
                                 type='number'
-                                value={newCard.qty}
+                                value={newRow.qty}
                                 onChange={changeQuantity}
                                 autoFocus>
                             </input>
@@ -136,7 +136,7 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
                             <select
                                 name='printing'
                                 onChange={changePrinting}
-                                value={`(${newCard.set}) ${newCard.cn}`}
+                                value={`(${newRow.set}) ${newRow.cn}`}
                             >
                                 {printingOptions.map(card => (
                                     <option key={card.id}>
@@ -148,7 +148,7 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
                         <p>
                             <label htmlFor='language'>Language:</label>
                             <br/>
-                            <select name='language' onChange={changeLanguage} value={newCard.lang}>
+                            <select name='language' onChange={changeLanguage} value={newRow.lang}>
                                 {languageOptions.map(card => (
                                     <option key={card.id}>{card.lang}</option>
                                 ))}
@@ -157,7 +157,7 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
                         <p>
                             <label htmlFor='finish'>Finish:</label>
                             <br/>
-                            <select name='finish' onChange={changeFinish} value={newCard.finish}>
+                            <select name='finish' onChange={changeFinish} value={newRow.finish}>
                                 {cardData?.finishes.map(finish => (
                                     <option key={finish}>{finish}</option>
                                 ))}
@@ -172,7 +172,7 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
                     </div>
                     <div className={styles['right']}>
                         {onCancel && <button onClick={onCancel}>Cancel</button>}
-                        {onSave && <button onClick={() => onSave(newCard)}>Save</button>}
+                        {onSave && <button onClick={() => onSave(newRow)}>Save</button>}
                     </div>
                 </div>
             </div>
@@ -180,4 +180,4 @@ function CardEditor({card, onDelete, onCancel, onSave}: CardEditorProps) {
     )
 }
 
-export default CardEditor;
+export default RowEditor;
