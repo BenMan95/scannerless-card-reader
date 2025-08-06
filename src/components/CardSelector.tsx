@@ -29,7 +29,7 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
         controller.current = {
             focus: () => nameInput.current!.focus(),
             clear: () => {
-                setVals({name:'', set:'', cn:''});
+                setVals({name:'', set:'eld', cn:''});
                 setResults([]);
                 setHovered(null);
             }
@@ -124,14 +124,14 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
                 </div>
             </div>
             <div className={styles['small-cards']}>
-                {results.map(card => {
-                    return (<img className={styles['card']}
-                                 src={getMainImages(card).small}
-                                 key={card.id}
-                                 alt={card.name}
-                                 onMouseOver={() => setHovered(card)}
-                                 onClick={() => onSelect(card)}/>)
-                })}
+                {results.map(card => <div>
+                    <img className={styles['card']}
+                         src={getMainImages(card).small}
+                         key={card.id}
+                         alt={card.name}
+                         onMouseOver={() => setHovered(card)}
+                         onClick={() => onSelect(card)}/>
+                </div>)}
             </div>
         </div>
     );
