@@ -1,69 +1,22 @@
-# React + TypeScript + Vite
+# Scannerless Card Reader
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple way to quickly input cards from Magic: The Gathering without a camera.
 
-Currently, two official plugins are available:
+I made this because in my experience, I've found card scanners to be clunky and finicky to use. Additionaly, they can have difficulty differentiating between different printings of the same card, slowing them down even more. Inputting cards this way lets you quickly narrow down to the correct card.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Setup
+- Make sure Node.js has been installed
+- Clone this repo to your system
+- Run `npm install` in the project directory
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Usage
+- Run the command `npm run dev` to begin running this project
+- Navigate to `localhost:5173` in your browser
+- Input cards as follows:
+  - Input some combination of name, set code, and collector number in the fields at the top left
+    - The name can be found at the top of the card
+    - Set code and collector number are found at the bottom left corner
+  - Hit enter or click on one of the icons that appear on the right to add your card to the table at the bottom
+    - Hold shift while doing so to edit the card before it is added
+  - Click a row in the table to edit it
+- Download the inputted cards with the button at the bottom
