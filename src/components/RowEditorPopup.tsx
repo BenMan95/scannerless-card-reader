@@ -83,28 +83,42 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
     }, [cardData]);
 
     function changeQuantity(e: React.ChangeEvent<HTMLInputElement>) {
-        const newVal: number = parseInt(e.target.value);
-        setNewRow({...newRow, qty: newVal});
+        const qty: number = parseInt(e.target.value);
+        setNewRow(current => ({...current, qty}));
     }
 
     function changePrinting(e: React.ChangeEvent<HTMLSelectElement>) {
         const index = e.target.selectedIndex;
         const newData = printingOptions[index];
         setCardData(newData);
-        setNewRow({...newRow, id: newData.id, set: newData.set, cn: newData.collector_number});
+        setNewRow(current => ({
+            ...current,
+            id: newData.id,
+            set: newData.set,
+            cn: newData.collector_number,
+            lang: newData.lang,
+            finish: newData.finishes[0],
+        }));
     }
 
     function changeLanguage(e: React.ChangeEvent<HTMLSelectElement>) {
         const index = e.target.selectedIndex;
         const newData = languageOptions[index];
         setCardData(newData);
-        setNewRow({...newRow, id: newData.id, lang: newData.lang});
+        setNewRow(current => ({
+            ...current,
+            id: newData.id,
+            lang: newData.lang,
+        }));
     }
 
     function changeFinish(e: React.ChangeEvent<HTMLSelectElement>) {
         const index = e.target.selectedIndex;
         const finish = cardData!.finishes[index];
-        setNewRow({...newRow, finish});
+        setNewRow(current => ({
+            ...current,
+            finish,
+        }))
     }
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
