@@ -110,13 +110,6 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
             onSelect(hovered);
     }
 
-    const map: Record<string, ScryfallCard> = {}
-    for (const card of results) {
-        if (map[card.id])
-            console.log(map[card.id], card);
-        map[card.id] = card;
-    }
-
     return (
         <div className={styles['outer']}>
             <div className={styles['inner']}>
@@ -155,7 +148,9 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
                         />
                     </p>
                     <div className={styles['settings']}>
-                        <p onClick={() => setOptionsOpen(current => !current)}>
+                        <p onClick={() => setOptionsOpen(current => !current)}
+                           onKeyDown={(e) => [' ','Enter'].includes(e.key) && e.currentTarget.click()}
+                           tabIndex={0}>
                             {optionsOpen ? '\u2212' : '+'} Settings
                         </p>
                         {
