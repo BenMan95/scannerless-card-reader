@@ -26,6 +26,14 @@ form.search {
     position: relative;
 }
 
+div.settings > div > div:last-child{
+    margin-bottom: 1em;
+}
+
+div:has(> input[type='checkbox']) {
+    display: flex;
+}
+
 div.big-card-container {
     flex: 1 1 auto;
 
@@ -46,7 +54,7 @@ div.small-cards {
     flex: 0 1 80%;
 
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(calc(150px), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     grid-auto-rows: max-content;
     grid-gap: 0.5em;
 

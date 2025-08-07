@@ -13,23 +13,33 @@ export interface CardSelectorController {
     clear: () => void,
 }
 
-interface FormVals {
-    name: string,
-    set: string,
-    cn: string,
-}
-
 function CardSelector({ onSelect, controller }: CardSelectorProps) {
-    const [formVals, setVals] = useState<FormVals>({name:'', set:'', cn:''});
+    const [searchName, setSearchName] = useState<string>('');
+    const [searchSet, setSearchSet] = useState<string>('');
+    const [searchNum, setSearchNum] = useState<string>('');
+    const [searchExtras, setSearchExtras] = useState<boolean>(false);
+    const [searchVariations, setSearchVariations] = useState<boolean>(false);
+
     const [results, setResults] = useState<ScryfallCard[]>([]);
     const [hovered, setHovered] = useState<ScryfallCard | null>(null);
-    const nameInput = useRef<HTMLInputElement>(null)
+    const [optionsOpen, setOptionsOpen] = useState<boolean>(false);
+    const [setLocked, setSetLocked] = useState<boolean>(false);
+    const [autofocused, setAutofocused] = useState<number>(0);
 
-    if (controller && nameInput.current) {
+    const inputs = [
+        useRef<HTMLInputElement>(null),
+        useRef<HTMLInputElement>(null),
+        useRef<HTMLInputElement>(null),
+    ]
+
+    if (controller && inputs[autofocused].current) {
         controller.current = {
-            focus: () => nameInput.current!.focus(),
+            focus: () => inputs[autofocused].current!.focus(),
             clear: () => {
-                setVals({name:'', set:'eld', cn:''});
+                setSearchName('');
+                if (!setLocked) setSearchSet('');
+                setSearchNum('');
+
                 setResults([]);
                 setHovered(null);
             }
@@ -42,15 +52,15 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
         const search: ScryfallSearch = {
             q: ['not:digital'],
             unique: 'prints',
-            include_extras: true,
-            include_variations: true,
+            include_extras: searchExtras,
+            include_variations: searchVariations,
         }
-        if (formVals.name) {
-            const escaped: string = formVals.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        if (searchName) {
+            const escaped: string = searchName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             search.q.push(`name:/${escaped}/`);
         }
-        if (formVals.set) search.q.push(`s:'${formVals.set}'`);
-        if (formVals.cn) search.q.push(`cn:'${formVals.cn}'`);
+        if (searchSet) search.q.push(`s:'${searchSet}'`);
+        if (searchNum) search.q.push(`cn:'${searchNum}'`);
 
         // If query is not empty, search for cards and add them to the results
         if (search.q.length > 1) {
@@ -74,20 +84,23 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
             setResults([]);
             setHovered(null);
         };
-    }, [formVals]);
+    }, [searchName, searchSet, searchNum, searchExtras, searchVariations]);
 
     // Functions for updating and checking form values
     function updateName(e: React.ChangeEvent<HTMLInputElement>) {
-        const newVal: string = e.target.value;
-        setVals(oldVals => ({...oldVals, name: newVal}))
+        setSearchName(e.target.value);
     }
     function updateSet(e: React.ChangeEvent<HTMLInputElement>) {
         const newVal: string = e.target.value.replaceAll(' ','');
-        setVals(oldVals => ({...oldVals, set: newVal}))
+        setSearchSet(newVal);
     }
-    function updateCN(e: React.ChangeEvent<HTMLInputElement>) {
+    function updateNum(e: React.ChangeEvent<HTMLInputElement>) {
         const newVal: string = e.target.value.replaceAll(' ','');
-        setVals(oldVals => ({...oldVals, cn: newVal}))
+        setSearchNum(newVal);
+    }
+
+    function updateAutofocus(e: React.ChangeEvent<HTMLSelectElement>) {
+        setAutofocused(e.target.selectedIndex);
     }
 
     // When submitted through the form, select the hovered card
@@ -97,23 +110,98 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
             onSelect(hovered);
     }
 
+    const map: Record<string, ScryfallCard> = {}
+    for (const card of results) {
+        if (map[card.id])
+            console.log(map[card.id], card);
+        map[card.id] = card;
+    }
+
     return (
         <div className={styles['outer']}>
             <div className={styles['inner']}>
                 <form className={styles['search']} autoComplete="off" onSubmit={handleSubmit}>
                     <p>
                         <label htmlFor="name">Card Name: </label>
-                        <input value={formVals.name} name="name" placeholder="Card Name" onChange={updateName}
-                               ref={nameInput} autoFocus/>
+                        <input
+                            value={searchName}
+                            id="name"
+                            placeholder="Storm Crow"
+                            onChange={updateName}
+                            ref={inputs[0]}
+                            autoFocus={autofocused === 0}
+                        />
                     </p>
                     <p>
                         <label htmlFor="set">Set Code: </label>
-                        <input value={formVals.set} name="set" placeholder="Set Code" onChange={updateSet}/>
+                        <input
+                            value={searchSet}
+                            id="set"
+                            placeholder="9ED"
+                            onChange={updateSet}
+                            ref={inputs[1]}
+                            autoFocus={autofocused === 1}
+                        />
                     </p>
                     <p>
                         <label htmlFor="cn">Number: </label>
-                        <input value={formVals.cn} name="cn" placeholder="Collector Number" onChange={updateCN}/>
+                        <input
+                            value={searchNum}
+                            id="cn"
+                            placeholder="100"
+                            onChange={updateNum}
+                            ref={inputs[2]}
+                            autoFocus={autofocused === 2}
+                        />
                     </p>
+                    <div className={styles['settings']}>
+                        <p onClick={() => setOptionsOpen(current => !current)}>
+                            {optionsOpen ? '\u2212' : '+'} Settings
+                        </p>
+                        {
+                            optionsOpen && <div>
+                                <div>
+                                    <input
+                                        type='checkbox'
+                                        id='extras'
+                                        checked={searchExtras}
+                                        onChange={() => setSearchExtras(current => !current)}
+                                    />
+                                    <label htmlFor='extras'>Include extras</label>
+                                </div>
+                                <div>
+                                    <input
+                                        type='checkbox'
+                                        id='variations'
+                                        checked={searchVariations}
+                                        onChange={() => setSearchVariations(current => !current)}
+                                    />
+                                    <label htmlFor='variations'>Include variations</label>
+                                </div>
+                                <div>
+                                    <input
+                                        type='checkbox'
+                                        id='lock'
+                                        checked={setLocked}
+                                        onChange={() => setSetLocked(current => !current)}
+                                    />
+                                    <label htmlFor='lock'>Lock set code</label>
+                                </div>
+                                <div>
+                                    <label htmlFor='autofocus'>Autofocus: </label>
+                                    <select
+                                        id='autofocus'
+                                        onChange={updateAutofocus}
+                                        value={['Name', 'Set', 'Number'][autofocused]}
+                                    >
+                                        <option>Name</option>
+                                        <option>Set</option>
+                                        <option>Number</option>
+                                    </select>
+                                </div>
+                            </div>
+                        }
+                    </div>
                     <input type="submit" hidden/>
                 </form>
                 <div className={styles['big-card-container']}>
@@ -124,10 +212,9 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
                 </div>
             </div>
             <div className={styles['small-cards']}>
-                {results.map(card => <div>
+                {results.map(card => <div key={card.id}>
                     <img className={styles['card']}
                          src={getMainImages(card).small}
-                         key={card.id}
                          alt={card.name}
                          onMouseOver={() => setHovered(card)}
                          onClick={() => onSelect(card)}/>

@@ -37,7 +37,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
                 setPrintingOptions(current => [...current, ...page]);
             }
         }).catch(e => {
-            if (e.name != 'AbortError') {
+            if (e.name !== 'AbortError') {
                 console.error(e);
             }
         });
@@ -123,7 +123,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
                             <br/>
                             <input
                                 className={styles['quantity']}
-                                name='quantity'
+                                id='quantity'
                                 type='number'
                                 value={newRow.qty}
                                 onChange={changeQuantity}
@@ -134,7 +134,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
                             <label htmlFor='printing'>Printing:</label>
                             <br/>
                             <select
-                                name='printing'
+                                id='printing'
                                 onChange={changePrinting}
                                 value={`(${newRow.set}) ${newRow.cn}`}
                             >
@@ -148,7 +148,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
                         <p>
                             <label htmlFor='language'>Language:</label>
                             <br/>
-                            <select name='language' onChange={changeLanguage} value={newRow.lang}>
+                            <select id='language' onChange={changeLanguage} value={newRow.lang}>
                                 {languageOptions.map(card => (
                                     <option key={card.id}>{card.lang}</option>
                                 ))}
@@ -157,7 +157,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
                         <p>
                             <label htmlFor='finish'>Finish:</label>
                             <br/>
-                            <select name='finish' onChange={changeFinish} value={newRow.finish}>
+                            <select id='finish' onChange={changeFinish} value={newRow.finish}>
                                 {cardData?.finishes.map(finish => (
                                     <option key={finish}>{finish}</option>
                                 ))}
