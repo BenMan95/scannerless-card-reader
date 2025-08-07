@@ -56,11 +56,13 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
             include_variations: searchVariations,
         }
         if (searchName) {
-            const escaped: string = searchName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            search.q.push(`name:/${escaped}/`);
+            // Disabled for now, since using regex for the name causes extras to be included
+            // const escaped: string = searchName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+            search.q.push(`name:"${searchName}"`);
         }
-        if (searchSet) search.q.push(`s:'${searchSet}'`);
-        if (searchNum) search.q.push(`cn:'${searchNum}'`);
+        if (searchSet) search.q.push(`s:"${searchSet}"`);
+        if (searchNum) search.q.push(`cn:"${searchNum}"`);
 
         // If query is not empty, search for cards and add them to the results
         if (search.q.length > 1) {
@@ -88,15 +90,13 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
 
     // Functions for updating and checking form values
     function updateName(e: React.ChangeEvent<HTMLInputElement>) {
-        setSearchName(e.target.value);
+        setSearchName(e.target.value.replaceAll('"',''));
     }
     function updateSet(e: React.ChangeEvent<HTMLInputElement>) {
-        const newVal: string = e.target.value.replaceAll(' ','');
-        setSearchSet(newVal);
+        setSearchSet(e.target.value.replaceAll(/[ "]/g,''));
     }
     function updateNum(e: React.ChangeEvent<HTMLInputElement>) {
-        const newVal: string = e.target.value.replaceAll(' ','');
-        setSearchNum(newVal);
+        setSearchNum(e.target.value.replaceAll(/[ "]/g,''));
     }
 
     function updateAutofocus(e: React.ChangeEvent<HTMLSelectElement>) {
