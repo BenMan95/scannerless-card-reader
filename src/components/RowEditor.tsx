@@ -109,6 +109,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
             ...current,
             id: newData.id,
             lang: newData.lang,
+            finish: newData.finishes[0],
         }));
     }
 
