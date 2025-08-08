@@ -2,10 +2,11 @@ import styles from './App.module.css';
 import React, { useState, useRef, useEffect, type ReactNode } from 'react';
 import CardSelector, { type CardSelectorController } from './components/CardSelector.tsx';
 import CardTable from './components/CardTable.tsx';
-import RowEditor, { type RowEditorProps } from './components/RowEditorPopup.tsx';
+import RowEditor, { type RowEditorProps } from './components/RowEditor.tsx';
 import { toCSV, fromCSV } from './utils/csv.ts';
 import type { Row } from './utils/types.ts';
 import type { ScryfallCard } from './utils/scryfall';
+import Popup from './components/Popup.tsx';
 
 function App(): ReactNode {
     const [rows, setRows] = useState<Row[]>([]);
@@ -180,7 +181,7 @@ function App(): ReactNode {
                     <button>Export</button>
                 </a>
             </div>
-            {editorProps && <RowEditor {...editorProps}/>}
+            {editorProps && <Popup><RowEditor {...editorProps}/></Popup>}
         </>
     );
 }

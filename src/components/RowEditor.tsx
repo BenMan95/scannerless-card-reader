@@ -1,4 +1,4 @@
-import styles from './RowEditorPopup.module.css';
+import styles from './RowEditor.module.css';
 import React, { useEffect, useState, useRef } from 'react';
 import type { Row } from '../utils/types';
 import type { ScryfallCard, ScryfallSearch } from '../utils/scryfall';
@@ -127,70 +127,68 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
     }
 
     return (
-        <div className={styles['background']}>
-            <div className={styles['window']}>
-                <div className={styles['main']}>
-                    <img className={styles['card']} src={cardData ? getMainImages(cardData).large : undefined}></img>
-                    <form className={styles['options']} onSubmit={handleSubmit} ref={form}>
-                        <p>
-                            <label htmlFor='quantity'>Quantity:</label>
-                            <br/>
-                            <input
-                                className={styles['quantity']}
-                                id='quantity'
-                                type='number'
-                                value={newRow.qty}
-                                onChange={changeQuantity}
-                                autoFocus>
-                            </input>
-                        </p>
-                        <p>
-                            <label htmlFor='printing'>Printing:</label>
-                            <br/>
-                            <select
-                                id='printing'
-                                onChange={changePrinting}
-                                value={`(${newRow.set}) ${newRow.cn}`}
-                            >
-                                {printingOptions.map(card => (
-                                    <option key={card.id}>
-                                        {`(${card.set}) ${card.collector_number}`}
-                                    </option>
-                                ))}
-                            </select>
-                        </p>
-                        <p>
-                            <label htmlFor='language'>Language:</label>
-                            <br/>
-                            <select id='language' onChange={changeLanguage} value={newRow.lang}>
-                                {languageOptions.map(card => (
-                                    <option key={card.id}>{card.lang}</option>
-                                ))}
-                            </select>
-                        </p>
-                        <p>
-                            <label htmlFor='finish'>Finish:</label>
-                            <br/>
-                            <select id='finish' onChange={changeFinish} value={newRow.finish}>
-                                {cardData?.finishes.map(finish => (
-                                    <option key={finish}>{finish}</option>
-                                ))}
-                            </select>
-                        </p>
-                        <input type="submit" hidden/>
-                    </form>
+        <>
+            <div className={styles['main']}>
+                <img className={styles['card']} src={cardData ? getMainImages(cardData).large : undefined}></img>
+                <form className={styles['options']} onSubmit={handleSubmit} ref={form}>
+                    <p>
+                        <label htmlFor='quantity'>Quantity:</label>
+                        <br/>
+                        <input
+                            className={styles['quantity']}
+                            id='quantity'
+                            type='number'
+                            value={newRow.qty}
+                            onChange={changeQuantity}
+                            autoFocus>
+                        </input>
+                    </p>
+                    <p>
+                        <label htmlFor='printing'>Printing:</label>
+                        <br/>
+                        <select
+                            id='printing'
+                            onChange={changePrinting}
+                            value={`(${newRow.set}) ${newRow.cn}`}
+                        >
+                            {printingOptions.map(card => (
+                                <option key={card.id}>
+                                    {`(${card.set}) ${card.collector_number}`}
+                                </option>
+                            ))}
+                        </select>
+                    </p>
+                    <p>
+                        <label htmlFor='language'>Language:</label>
+                        <br/>
+                        <select id='language' onChange={changeLanguage} value={newRow.lang}>
+                            {languageOptions.map(card => (
+                                <option key={card.id}>{card.lang}</option>
+                            ))}
+                        </select>
+                    </p>
+                    <p>
+                        <label htmlFor='finish'>Finish:</label>
+                        <br/>
+                        <select id='finish' onChange={changeFinish} value={newRow.finish}>
+                            {cardData?.finishes.map(finish => (
+                                <option key={finish}>{finish}</option>
+                            ))}
+                        </select>
+                    </p>
+                    <input type="submit" hidden/>
+                </form>
+            </div>
+            <div className={styles['buttons']}>
+                <div className={styles['left']}>
+                    {onDelete && <button onClick={onDelete}>Delete</button>}
                 </div>
-                <div className={styles['buttons']}>
-                    <div className={styles['left']}>
-                        {onDelete && <button onClick={onDelete}>Delete</button>}
-                    </div>
-                    <div className={styles['right']}>
-                        {onCancel && <button onClick={onCancel}>Cancel</button>}
-                        {onSave && <button onClick={() => onSave(newRow)}>Save</button>}
-                    </div>
+                <div className={styles['right']}>
+                    {onCancel && <button onClick={onCancel}>Cancel</button>}
+                    {onSave && <button onClick={() => onSave(newRow)}>Save</button>}
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 

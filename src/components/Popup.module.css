@@ -1,0 +1,24 @@
+div.background {
+    position: fixed;
+    top: 0;
+
+    min-width: 100%;
+    min-height: 100%;
+
+    background-color: rgba(0,0,0,0.2);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.window {
+    opacity: 100%;
+    background-color: white;
+    border-radius: 1em;
+    padding: 1em;
+    
+    display: flex;
+    flex-direction: column;
+}
+
