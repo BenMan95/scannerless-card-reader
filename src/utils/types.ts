@@ -1,10 +1,10 @@
 interface Row {
-    qty: number,
-    id: string,
-    name: string,
-    set: string,
-    cn: string,
-    lang: string,
+    quantity: number,
+    scryfall_id: string,
+    card_name: string,
+    set_code: string,
+    collector_number: string,
+    language: string,
     finish: string,
 }
 

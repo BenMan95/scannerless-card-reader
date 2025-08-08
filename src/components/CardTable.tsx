@@ -22,11 +22,11 @@ function CardTable({ rows, handleClick }: CardTableProps) {
             <tbody>
                 {rows.map((card, index) => (
                     <tr key={index} onClick={() => handleClick(index)}>
-                        <td>{card.qty}</td>
-                        <td>{card.name}</td>
-                        <td>{card.set}</td>
-                        <td>{card.cn}</td>
-                        <td>{card.lang}</td>
+                        <td>{card.quantity}</td>
+                        <td>{card.card_name}</td>
+                        <td>{card.set_code}</td>
+                        <td>{card.collector_number}</td>
+                        <td>{card.language}</td>
                         <td>{card.finish}</td>
                     </tr>
                 ))}
