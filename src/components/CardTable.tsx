@@ -1,4 +1,4 @@
-import './CardTable.module.css';
+import styles from './CardTable.module.css';
 import type { Row } from '../utils/types';
 
 export interface CardTableProps {
@@ -8,7 +8,7 @@ export interface CardTableProps {
 
 function CardTable({ rows, handleClick }: CardTableProps) {
     return (
-        <table>
+        <table border={1} rules='rows' className={styles['cards']}>
             <thead>
                 <tr>
                     <th>#</th>
