@@ -31,10 +31,10 @@ const PRESETS: Record<string, ExportSettings> = {
 
 export interface ExportEditorProps {
     onCancel?: () => void,
-    onSave?: (settings: ExportSettings) => void,
+    onExport?: (settings: ExportSettings) => void,
 }
 
-function ExportEditor({ onCancel, onSave }: ExportEditorProps) {
+function ExportEditor({ onCancel, onExport }: ExportEditorProps) {
     const [preset, setPreset] = useState<string>('Default');
     const [settings, setSettings] = useState<ExportSettings>(PRESETS['Default']);
 
@@ -172,7 +172,7 @@ function ExportEditor({ onCancel, onSave }: ExportEditorProps) {
             </div>
             <div className={styles['buttons']}>
                 <div>{onCancel && <button onClick={onCancel}>Cancel</button>}</div>
-                <div>{onSave && <button onClick={() => onSave(settings)}>Save</button>}</div>
+                <div>{onExport && <button onClick={() => onExport(settings)}>Export</button>}</div>
             </div>
         </>
     )
