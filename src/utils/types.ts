@@ -8,6 +8,16 @@ interface Row {
     finish: string,
 }
 
+const rowFields: (keyof Row)[] = [
+    'quantity',
+    'scryfall_id',
+    'card_name',
+    'set_code',
+    'collector_number',
+    'language',
+    'finish',
+]
+
 type PartialRow = Partial<Record<keyof Row, string>>;
 
 interface ImportSettings {
@@ -21,3 +31,4 @@ interface ExportSettings {
 }
 
 export type { Row, PartialRow, ImportSettings, ExportSettings };
+export { rowFields };
