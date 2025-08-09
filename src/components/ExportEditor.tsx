@@ -29,12 +29,12 @@ const PRESETS: Record<string, ExportSettings> = {
     },
 }
 
-export interface RowEditorProps {
+export interface ExportEditorProps {
     onCancel?: () => void,
     onSave?: (settings: ExportSettings) => void,
 }
 
-function ExportEditor({ onCancel, onSave }: RowEditorProps) {
+function ExportEditor({ onCancel, onSave }: ExportEditorProps) {
     const [preset, setPreset] = useState<string>('Default');
     const [settings, setSettings] = useState<ExportSettings>(PRESETS['Default']);
 
