@@ -2,19 +2,21 @@ import styles from './App.module.css';
 import React, { useState, useRef, useEffect } from 'react';
 import CardSelector, { type CardSelectorController } from './components/CardSelector.tsx';
 import CardTable from './components/CardTable.tsx';
-import RowEditor, { type RowEditorProps } from './components/RowEditor.tsx';
 import { toCSV, fromCSV } from './utils/csv.ts';
 import type { Row } from './utils/types.ts';
 import type { ScryfallCard } from './utils/scryfall';
 import Popup from './components/Popup.tsx';
+import RowEditor, { type RowEditorProps } from './components/RowEditor.tsx';
+import ExportEditor, { type ExportEditorProps } from './components/ExportEditor.tsx';
 
 function App() {
     const [rows, setRows] = useState<Row[]>([]);
-    const [outURL, setOutURL] = useState<string | undefined>(undefined);
-    const [editorProps, setEditorProps] = useState<RowEditorProps | null>(null)
     const [shiftHeld, setShiftHeld] = useState<boolean>(false);
     const fileInput = useRef<HTMLInputElement>(null);
     const selectorController = useRef<CardSelectorController>(null);
+
+    const [rowEditorProps, setRowEditorProps] = useState<RowEditorProps | null>(null)
+    const [exportEditorProps, setExportEditorProps] = useState<ExportEditorProps | null>(null);
 
     useEffect(() => {
         function downHandler(e: KeyboardEvent) {
@@ -64,18 +66,18 @@ function App() {
             const props: RowEditorProps = {
                 row: newRow,
                 onCancel: () => {
-                    setEditorProps(null);
+                    setRowEditorProps(null);
                     selectorController.current!.focus();
                 },
                 onSave: (editedRow) => {
                     checkDuplicatesAndAdd(editedRow);
-                    setEditorProps(null);
+                    setRowEditorProps(null);
                     selectorController.current!.focus();
                     selectorController.current!.clear();
                 },
             }
 
-            setEditorProps(props)
+            setRowEditorProps(props);
         } else {
             checkDuplicatesAndAdd(newRow);
             selectorController.current!.focus();
@@ -125,34 +127,14 @@ function App() {
         }
     }
 
-    useEffect(() => {
-        const array = rows.map(card => [
-            card.quantity,
-            card.scryfall_id,
-            card.card_name,
-            card.set_code,
-            card.collector_number,
-            card.language,
-            card.finish
-        ]);
-        array.unshift(['Count', 'ID', 'Name', 'Edition', 'Collector Number', 'Language', 'Foil']);
-
-        const csv = toCSV(array);
-        const blob = new Blob([csv], {type: 'text/csv'})
-        const url = URL.createObjectURL(blob);
-
-        setOutURL(url);
-        return () => URL.revokeObjectURL(url);
-    }, [rows]);
-
     function handleEdit(editIndex: number) {
         const props: RowEditorProps = {
             row: rows[editIndex],
             onDelete: () => {
                 setRows(current => current.filter((_, idx) => idx !== editIndex));
-                setEditorProps(null);
+                setRowEditorProps(null);
             },
-            onCancel: () => setEditorProps(null),
+            onCancel: () => setRowEditorProps(null),
             onSave: (newRow: Row) => {
                 setRows(current => {
                     const newRowCopy: Row = {...newRow};
@@ -169,11 +151,45 @@ function App() {
                     }).filter(row => row !== null)
                 })
 
-                setEditorProps(null);
+                setRowEditorProps(null);
             },
         }
 
-        setEditorProps(props);
+        setRowEditorProps(props);
+    }
+
+    function handleExport() {
+        setExportEditorProps({
+            onCancel: () => setExportEditorProps(null),
+            onSave: settings => {
+                const output: any[][] = []
+
+                if (settings.write_headers) {
+                    const outputRow: string[] = []
+                    for (const column of settings.columns)
+                        outputRow.push(column[1]);
+                    output.push(outputRow);
+                }
+
+                for (const row of rows) {
+                    const outputRow: any[] = settings.columns.map(column => row[column[0]]);
+                    output.push(outputRow);
+                }
+
+                const csv = toCSV(output);
+                const blob = new Blob([csv], {type: 'text/csv'});
+                const url = URL.createObjectURL(blob);
+
+                // Workaround to trigger download
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'cards.csv';
+                link.click();
+
+                URL.revokeObjectURL(url);
+                setExportEditorProps(null);
+            }
+        })
     }
 
     return (
@@ -185,11 +201,10 @@ function App() {
             <div className={styles['buttons']}>
                 <button onClick={() => fileInput.current?.click()}>Import</button>
                 <input id="input" type="file" ref={fileInput} onChange={readFile} hidden/>
-                <a href={outURL} download="cards.csv">
-                    <button>Export</button>
-                </a>
+                <button onClick={handleExport}>Export</button>
             </div>
-            {editorProps && <Popup><RowEditor {...editorProps}/></Popup>}
+            {rowEditorProps && <Popup><RowEditor {...rowEditorProps}/></Popup>}
+            {exportEditorProps && <Popup><ExportEditor {...exportEditorProps}/></Popup>}
         </>
     );
 }
