@@ -1,5 +1,5 @@
 import styles from './ExportEditor.module.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ExportSettings } from '../utils/types';
 import { rowFields } from '../utils/types';
 
@@ -37,6 +37,18 @@ export interface ExportEditorProps {
 function ExportEditor({ onCancel, onSave }: ExportEditorProps) {
     const [preset, setPreset] = useState<string>('Default');
     const [settings, setSettings] = useState<ExportSettings>(PRESETS['Default']);
+
+    useEffect(() => {
+        function downHandler(e: KeyboardEvent) {
+            if (onCancel && e.key === 'Escape') onCancel();
+        }
+
+        addEventListener('keydown', downHandler);
+        return () => {
+            removeEventListener('keydown', downHandler);
+        }
+    }, []);
+
 
     function editPreset(e: React.ChangeEvent<HTMLSelectElement>) {
         const newPreset = e.target.value;
