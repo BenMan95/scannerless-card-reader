@@ -21,7 +21,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
     useEffect(() => {
         const controller: AbortController = new AbortController();
 
-        fetch(encodeIdURL(row.id), {signal: controller.signal})
+        fetch(encodeIdURL(row.scryfall_id), {signal: controller.signal})
         .then(resp => resp.json())
         .then(async (card: ScryfallCard) => {
             setCardData(card);
@@ -83,8 +83,8 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
     }, [cardData]);
 
     function changeQuantity(e: React.ChangeEvent<HTMLInputElement>) {
-        const qty: number = parseInt(e.target.value);
-        setNewRow(current => ({...current, qty}));
+        const quantity: number = parseInt(e.target.value);
+        setNewRow(current => ({...current, quantity}));
     }
 
     function changePrinting(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -93,10 +93,10 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
         setCardData(newData);
         setNewRow(current => ({
             ...current,
-            id: newData.id,
-            set: newData.set,
-            cn: newData.collector_number,
-            lang: newData.lang,
+            scryfall_id: newData.id,
+            set_code: newData.set,
+            collector_number: newData.collector_number,
+            language: newData.lang,
             finish: newData.finishes[0],
         }));
     }
@@ -107,8 +107,8 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
         setCardData(newData);
         setNewRow(current => ({
             ...current,
-            id: newData.id,
-            lang: newData.lang,
+            scryfall_id: newData.id,
+            language: newData.lang,
             finish: newData.finishes[0],
         }));
     }
@@ -129,6 +129,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
 
     return (
         <>
+            <h1>Edit Card</h1>
             <div className={styles['main']}>
                 <img className={styles['card']} src={cardData ? getMainImages(cardData).large : undefined}></img>
                 <form className={styles['options']} onSubmit={handleSubmit} ref={form}>
@@ -139,7 +140,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
                             className={styles['quantity']}
                             id='quantity'
                             type='number'
-                            value={newRow.qty}
+                            value={newRow.quantity}
                             onChange={changeQuantity}
                             autoFocus>
                         </input>
@@ -150,7 +151,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
                         <select
                             id='printing'
                             onChange={changePrinting}
-                            value={`(${newRow.set}) ${newRow.cn}`}
+                            value={`(${newRow.set_code}) ${newRow.collector_number}`}
                         >
                             {printingOptions.map(card => (
                                 <option key={card.id}>
@@ -162,7 +163,7 @@ function RowEditor({row, onDelete, onCancel, onSave}: RowEditorProps) {
                     <p>
                         <label htmlFor='language'>Language:</label>
                         <br/>
-                        <select id='language' onChange={changeLanguage} value={newRow.lang}>
+                        <select id='language' onChange={changeLanguage} value={newRow.language}>
                             {languageOptions.map(card => (
                                 <option key={card.id}>{card.lang}</option>
                             ))}

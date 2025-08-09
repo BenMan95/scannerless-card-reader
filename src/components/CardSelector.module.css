@@ -26,6 +26,10 @@ form.search {
     position: relative;
 }
 
+div.settings > p {
+    cursor: pointer;
+}
+
 div.settings > div > div:last-child{
     margin-bottom: 1em;
 }

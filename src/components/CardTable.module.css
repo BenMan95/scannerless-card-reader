@@ -1,8 +1,20 @@
-table {
+table.cards {
     outline: 2px solid black;
     margin: auto;
 }
 
-th, td, tr {
-    outline: 1px solid black;
+table.cards th:nth-child(2) {
+    text-align: left;
+}
+
+table.cards td {
+    text-align: center;
+}
+
+table.cards th:first-child {
+    min-width: 1em;
+}
+
+table.cards td:nth-child(2) {
+    text-align: left;
 }

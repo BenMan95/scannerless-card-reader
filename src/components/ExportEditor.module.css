@@ -1,0 +1,46 @@
+div.presets {
+    margin-bottom: 0.5em;
+}
+
+table.columns {
+    outline: 2px solid black;
+}
+
+table.columns th:first-child {
+    min-width: 1em;
+}
+
+table.columns td {
+    text-align: center;
+}
+
+table.columns td:last-child {
+    cursor: pointer;
+}
+
+div.add-column {
+    margin-top: 0.5em;
+    margin-bottom: 1em;
+    cursor: pointer;
+}
+
+div.buttons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 1em;
+}
+
+div.buttons > div:first-child {
+    flex: 1 0 auto;
+
+    display: flex;
+    flex-direction: row;
+}
+
+div.buttons > div:last-child {
+    flex: 1 0 auto;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}

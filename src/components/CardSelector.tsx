@@ -151,7 +151,7 @@ function CardSelector({ onSelect, controller }: CardSelectorProps) {
                         <p onClick={() => setOptionsOpen(current => !current)}
                            onKeyDown={(e) => [' ','Enter'].includes(e.key) && e.currentTarget.click()}
                            tabIndex={0}>
-                            {optionsOpen ? '\u2212' : '+'} Settings
+                           {optionsOpen ? '\u2212' : '+'} Settings
                         </p>
                         {
                             optionsOpen && <div>
