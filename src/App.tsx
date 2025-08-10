@@ -8,6 +8,10 @@ import type { ScryfallCard } from './utils/scryfall';
 import Popup from './components/Popup.tsx';
 import RowEditor, { type RowEditorProps } from './components/RowEditor.tsx';
 import ExportEditor, { type ExportEditorProps } from './components/ExportEditor.tsx';
+import ImportEditor, { type ImportEditorProps } from './components/ImportEditor.tsx';
+
+type PopupState = null | 'rowEdit' | 'importEdit' | 'exportEdit';
+type PopupProps = null | RowEditorProps | ImportEditorProps | ExportEditorProps;
 
 function App() {
     const [rows, setRows] = useState<Row[]>([]);
@@ -15,8 +19,8 @@ function App() {
     const fileInput = useRef<HTMLInputElement>(null);
     const selectorController = useRef<CardSelectorController>(null);
 
-    const [rowEditorProps, setRowEditorProps] = useState<RowEditorProps | null>(null)
-    const [exportEditorProps, setExportEditorProps] = useState<ExportEditorProps | null>(null);
+    const [popupState, setPopupState] = useState<PopupState>(null);
+    const [popupProps, setPopupProps] = useState<PopupProps>(null);
 
     useEffect(() => {
         function downHandler(e: KeyboardEvent) {
@@ -66,18 +70,19 @@ function App() {
             const props: RowEditorProps = {
                 row: newRow,
                 onCancel: () => {
-                    setRowEditorProps(null);
+                    setPopupState(null);
                     selectorController.current!.focus();
                 },
                 onSave: (editedRow) => {
+                    setPopupState(null);
                     checkDuplicatesAndAdd(editedRow);
-                    setRowEditorProps(null);
                     selectorController.current!.focus();
                     selectorController.current!.clear();
                 },
             }
 
-            setRowEditorProps(props);
+            setPopupState('rowEdit');
+            setPopupProps(props);
         } else {
             checkDuplicatesAndAdd(newRow);
             selectorController.current!.focus();
@@ -85,56 +90,16 @@ function App() {
         }
     }
 
-    async function readFile(e: React.ChangeEvent<HTMLInputElement>) {
-        const files = e.target.files;
-        if (files && files.length > 0) {
-            const reader = new FileReader();
-            reader.readAsText(files[0]);
-
-            reader.onerror = () => alert('Failed to read file');
-            reader.onloadend = () => e.target.value = '';
-            reader.onload = () => {
-                const array: string[][] = fromCSV(reader.result as string);
-
-                const headers: string[] | undefined = array.shift();
-                if (!headers) return;
-
-                const mappedHeaders: (string | undefined)[] = headers.map(attr => {
-                    const attrs_map: Record<string, string> = {
-                        'Count':            'quantity',
-                        'ID':               'scryfall_id',
-                        'Name':             'card_name',
-                        'Edition':          'set_code',
-                        'Collector Number': 'collector_number',
-                        'Language':         'language',
-                        'Foil':             'finish',
-                    }
-                    return attrs_map[attr];
-                });
-
-                const rows: Row[] = array.map(inputRow => {
-                    const rowObj: any = {};
-                    for (const i in inputRow) {
-                        const header = mappedHeaders[i];
-                        if (header) rowObj[header] = inputRow[i];
-                    }
-                    rowObj.qty = parseInt(rowObj.quantity);
-                    return rowObj;
-                });
-
-                setRows(rows);
-            }
-        }
-    }
-
     function handleEdit(editIndex: number) {
-        const props: RowEditorProps = {
+        setPopupState('rowEdit');
+        setPopupProps({
             row: rows[editIndex],
             onDelete: () => {
                 setRows(current => current.filter((_, idx) => idx !== editIndex));
-                setRowEditorProps(null);
+                setPopupState(null);
+                setPopupProps(null);
             },
-            onCancel: () => setRowEditorProps(null),
+            onCancel: () => setPopupState(null),
             onSave: (newRow: Row) => {
                 setRows(current => {
                     const newRowCopy: Row = {...newRow};
@@ -151,17 +116,68 @@ function App() {
                     }).filter(row => row !== null)
                 })
 
-                setRowEditorProps(null);
+                setPopupState(null);
             },
-        }
+        });
+    }
 
-        setRowEditorProps(props);
+    async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            const reader = new FileReader();
+            reader.readAsText(files[0]);
+
+            reader.onerror = () => alert('Failed to read file');
+            reader.onload = () => {
+                const array: string[][] = fromCSV(reader.result as string);
+                console.log(array);
+
+                setPopupState('importEdit');
+                setPopupProps({
+                    data: array,
+                    onCancel: () => setPopupState(null),
+                    onImport: settings => {
+                        console.log(settings);
+                        setPopupState(null);
+                    },
+                });
+
+                // const headers: string[] | undefined = array.shift();
+                // if (!headers) return;
+
+                // const mappedHeaders: (string | undefined)[] = headers.map(attr => {
+                //     const attrs_map: Record<string, string> = {
+                //         'Count':            'quantity',
+                //         'ID':               'scryfall_id',
+                //         'Name':             'card_name',
+                //         'Edition':          'set_code',
+                //         'Collector Number': 'collector_number',
+                //         'Language':         'language',
+                //         'Foil':             'finish',
+                //     }
+                //     return attrs_map[attr];
+                // });
+
+                // const rows: Row[] = array.map(inputRow => {
+                //     const rowObj: any = {};
+                //     for (const i in inputRow) {
+                //         const header = mappedHeaders[i];
+                //         if (header) rowObj[header] = inputRow[i];
+                //     }
+                //     rowObj.qty = parseInt(rowObj.quantity);
+                //     return rowObj;
+                // });
+
+                // setRows(rows);
+            }
+        }
     }
 
     function handleExport() {
-        setExportEditorProps({
-            onCancel: () => setExportEditorProps(null),
-            onSave: settings => {
+        setPopupState('exportEdit');
+        setPopupProps({
+            onCancel: () => setPopupState(null),
+            onExport: settings => {
                 const output: any[][] = []
 
                 if (settings.write_headers) {
@@ -187,9 +203,22 @@ function App() {
                 link.click();
 
                 URL.revokeObjectURL(url);
-                setExportEditorProps(null);
+                setPopupState(null);
             }
         })
+    }
+
+    function getPopupElement() {
+        switch (popupState) {
+            case 'rowEdit':
+                return <Popup><RowEditor {...popupProps as RowEditorProps}/></Popup>;
+            case 'importEdit':
+                return <Popup><ImportEditor {...popupProps as ImportEditorProps}/></Popup>;
+            case 'exportEdit':
+                return <Popup><ExportEditor {...popupProps as ExportEditorProps}/></Popup>;
+            default:
+                return null;
+        }
     }
 
     return (
@@ -200,11 +229,10 @@ function App() {
             <br/>
             <div className={styles['buttons']}>
                 <button onClick={() => fileInput.current?.click()}>Import</button>
-                <input id="input" type="file" ref={fileInput} onChange={readFile} hidden/>
+                <input id="input" type="file" ref={fileInput} onChange={handleImport} value='' hidden/>
                 <button onClick={handleExport}>Export</button>
             </div>
-            {rowEditorProps && <Popup><RowEditor {...rowEditorProps}/></Popup>}
-            {exportEditorProps && <Popup><ExportEditor {...exportEditorProps}/></Popup>}
+            {getPopupElement()}
         </>
     );
 }
