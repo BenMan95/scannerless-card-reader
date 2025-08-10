@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import CardSelector, { type CardSelectorController } from './components/CardSelector.tsx';
 import CardTable from './components/CardTable.tsx';
 import { toCSV, fromCSV } from './utils/csv.ts';
-import type { Row } from './utils/types.ts';
+import { rowFields, type PartialRow, type Row } from './utils/types.ts';
 import type { ScryfallCard } from './utils/scryfall';
 import Popup from './components/Popup.tsx';
 import RowEditor, { type RowEditorProps } from './components/RowEditor.tsx';
@@ -57,13 +57,13 @@ function App() {
         }
 
         let newRow: Row = {
-            quantity:    1,
-            scryfall_id:     cardData.id,
-            card_name:   cardData.name,
-            set_code:    cardData.set,
-            collector_number:     cardData.collector_number,
-            language:   cardData.lang,
-            finish: cardData.finishes[0],
+            quantity:         1,
+            scryfall_id:      cardData.id,
+            card_name:        cardData.name,
+            set_code:         cardData.set,
+            collector_number: cardData.collector_number,
+            language:         cardData.lang,
+            finish:           cardData.finishes[0],
         };
 
         if (shiftHeld) {
@@ -130,45 +130,34 @@ function App() {
             reader.onerror = () => alert('Failed to read file');
             reader.onload = () => {
                 const array: string[][] = fromCSV(reader.result as string);
-                console.log(array);
 
                 setPopupState('importEdit');
                 setPopupProps({
                     data: array,
                     onCancel: () => setPopupState(null),
                     onImport: settings => {
-                        console.log(settings);
+                        if (settings.skip_first)
+                            array.shift();
+
+                        const partials: PartialRow[] = array.map(row => {
+                            const partial: PartialRow = {};
+                            for (const field of rowFields)
+                                if (settings.columns[field] !== undefined)
+                                    partial[field] = row[settings.columns[field]];
+                            return partial;
+                        });
+
+                        // TODO: Fill in potential undefined values
+
+                        const newRows: Row[] = partials.map(partial => ({
+                            ...partial,
+                            quantity: parseInt(partial.quantity!),
+                        } as Row))
+
+                        setRows(newRows);
                         setPopupState(null);
                     },
                 });
-
-                // const headers: string[] | undefined = array.shift();
-                // if (!headers) return;
-
-                // const mappedHeaders: (string | undefined)[] = headers.map(attr => {
-                //     const attrs_map: Record<string, string> = {
-                //         'Count':            'quantity',
-                //         'ID':               'scryfall_id',
-                //         'Name':             'card_name',
-                //         'Edition':          'set_code',
-                //         'Collector Number': 'collector_number',
-                //         'Language':         'language',
-                //         'Foil':             'finish',
-                //     }
-                //     return attrs_map[attr];
-                // });
-
-                // const rows: Row[] = array.map(inputRow => {
-                //     const rowObj: any = {};
-                //     for (const i in inputRow) {
-                //         const header = mappedHeaders[i];
-                //         if (header) rowObj[header] = inputRow[i];
-                //     }
-                //     rowObj.qty = parseInt(rowObj.quantity);
-                //     return rowObj;
-                // });
-
-                // setRows(rows);
             }
         }
     }
