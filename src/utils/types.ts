@@ -18,8 +18,6 @@ const rowFields: (keyof Row)[] = [
     'finish',
 ]
 
-type PartialRow = Partial<Record<keyof Row, string>>;
-
 interface ImportSettings {
     skip_first: boolean,
     columns: Partial<Record<keyof Row, number>>,
@@ -30,5 +28,5 @@ interface ExportSettings {
     columns: [keyof Row, string][],
 }
 
-export type { Row, PartialRow, ImportSettings, ExportSettings };
+export type { Row, ImportSettings, ExportSettings };
 export { rowFields };

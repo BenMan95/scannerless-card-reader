@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import CardSelector, { type CardSelectorController } from './components/CardSelector.tsx';
 import CardTable from './components/CardTable.tsx';
 import { toCSV, fromCSV } from './utils/csv.ts';
-import { rowFields, type PartialRow, type Row } from './utils/types.ts';
+import { rowFields, type Row } from './utils/types.ts';
 import type { ScryfallCard } from './utils/scryfall';
 import Popup from './components/Popup.tsx';
 import RowEditor, { type RowEditorProps } from './components/RowEditor.tsx';
@@ -136,11 +136,12 @@ function App() {
                     data: array,
                     onCancel: () => setPopupState(null),
                     onImport: settings => {
+
                         if (settings.skip_first)
                             array.shift();
 
-                        const partials: PartialRow[] = array.map(row => {
-                            const partial: PartialRow = {};
+                        const partials: Record<string, string>[] = array.map(row => {
+                            const partial: Record<string, string> = {};
                             for (const field of rowFields)
                                 if (settings.columns[field] !== undefined)
                                     partial[field] = row[settings.columns[field]];
@@ -218,7 +219,7 @@ function App() {
             <br/>
             <div className={styles['buttons']}>
                 <button onClick={() => fileInput.current?.click()}>Import</button>
-                <input id="input" type="file" ref={fileInput} onChange={handleImport} value='' hidden/>
+                <input id="input" type="file" accept="text/csv" ref={fileInput} onChange={handleImport} value='' hidden/>
                 <button onClick={handleExport}>Export</button>
             </div>
             {getPopupElement()}
