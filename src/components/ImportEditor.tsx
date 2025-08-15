@@ -88,7 +88,7 @@ function ImportEditor({ data, onCancel, onImport }: ImportEditorProps) {
             <h1>Import from CSV</h1>
             {minLength == maxLength ? null :
                 <div className={styles['warning']}>
-                    Warning: Rows have uneven lengths. May cause issues.
+                    Warning: Rows have uneven lengths. Data may be missing.
                 </div>
             }
             {data &&
