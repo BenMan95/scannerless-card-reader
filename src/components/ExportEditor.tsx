@@ -117,7 +117,7 @@ function ExportEditor({ onCancel, onExport }: ExportEditorProps) {
                     {Object.keys(PRESETS).map(preset =>
                         <option key={preset}>{preset}</option>
                     )}
-                    <option onChange={() => setPreset('Custom')}>Custom</option>
+                    <option>Custom</option>
                 </select>
             </div>
             <table border={1} rules='rows' className={styles['columns']}>
@@ -157,7 +157,6 @@ function ExportEditor({ onCancel, onExport }: ExportEditorProps) {
             <div
                 className={styles['add-column']}
                 onClick={addColumn}
-                tabIndex={0}
             >
                 + Add column
             </div>
